@@ -9,8 +9,26 @@ def index(request):
 
 
 def login(request):
-    res_data = {'test':'test'}
-    return render(request, 'login.html', res_data)
+    if request.method == 'GET':
+        return render(request, 'login.html')
+    elif request.method == 'POST':
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        res_data = {}
+        if not (username and password):
+            res_data['error'] = 'Login failed'
+        else:
+            try:
+                fcuser = ApdoUsers.objects.get(username=username)
+                if check_password(password, fcuser.password):
+                    request.session['user'] = fcuser.id
+                    return redirect('/')
+
+                else:
+                    res_data['error'] = 'Login failed'
+            except ApdoUsers.DoesNotExist:
+                res_data['error'] = 'Login failed'
+        return render(request, 'login.html', res_data)
 
 
 def logout(request):
