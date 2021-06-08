@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="py-5" style="">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+            <h1>부경재고관리시스템 회원가입</h1>
+            <form class="user" action="{% url 'register' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="email" name="email" id="email"  class="form-control form-control-user" placeholder="이메일 주소">
+                        <span class="help-block"></span>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6 mb-3 mb-sm-0">
+                        <input type="password" name="password" id="password" class="form-control form-control-user" placeholder="비밀번호">
+                            <span class="help-block">{{ error }} </span>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="password" class="form-control form-control-user"
+                            id="re_password" placeholder="비밀번호" name="re_password">
+                            <span class="help-block"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                  <input type="text" class="form-control form-control-user" id="employee_id" placeholder="직원아이디" name="employee_id">
+                </div>
+
+                <input  type='submit' class="btn btn-primary btn-user btn-block" value="회원가입"/>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+{% endblock content %}
