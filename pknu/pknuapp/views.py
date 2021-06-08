@@ -11,6 +11,8 @@ from operator import itemgetter
 from django.core.paginator import Paginator
 from django.db.models.functions import Cast
 from django.db import connections
+import time
+import datetime
 
 # Create your views here.
 
@@ -26,6 +28,20 @@ def index(request):
     res_data = {'test':'test'}
     return render(request, 'index.html', res_data)
 
+
+def show_employee(request):
+    user_id = request.session.get('user')
+    if user_id:
+        employees_data = Employees.objects.filter().values()
+        e_pagenator = Paginator(employees_data, 10)
+        ep = int(request.GET.get('ep', 1))
+        employees = e_pagenator.get_page(ep)
+
+        res_data = {
+            'employees':employees,
+            'employees_data':employees_data
+        }
+        return render(request, 'show_employee.html', res_data)
 
 def login(request):
     if request.method == 'GET':
@@ -69,6 +85,6 @@ def register(request):
         if password != re_password :
             res_data['error'] = 'Repeat Password '
         else:
-            user = Member(email=email, passwd=make_password(password), employee_id=employee_id)
+            user = Member(email=email, passwd=make_password(password), employee_id=employee_id, created_at=datetime.datetime.now())
             user.save()
         return render(request, 'register.html', res_data)
