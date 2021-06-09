@@ -8,6 +8,20 @@ def index(request):
     return render(request, 'index.html', res_data)
 
 
+def customers(request):
+    res_data = {'test': '안녕 나는 규빈이라고해 '}
+
+
+
+
+
+
+    return render(request, 'customers.html', res_data)
+
+
+def statistics(request):
+    pass
+
 def login(request):
     if request.method == 'GET':
         return render(request, 'login.html')

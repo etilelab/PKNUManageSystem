@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <h1 class="display-4">Display 4</h1>
+          <div class="col-md-12">
+            <ul class="nav nav-tabs">
+              <li class="nav-item"> <a href="" class="active nav-link" data-toggle="tab" data-target="#tabone">Tab 1</a> </li>
+              <li class="nav-item"> <a class="nav-link" href="" data-toggle="tab" data-target="#tabtwo2">Tab 2</a> </li>
+              <li class="nav-item"> <a href="" class="nav-link" data-toggle="tab" data-target="#tabthree">Tab 3</a> </li>
+            </ul>
+            <div class="tab-content mt-2">
+              <div class="tab-pane fade show active" id="tabone" role="tabpanel">
+                <p class="">When I hear the buzz of the little world among the stalks, and grow familiar with the countless indescribable forms.</p>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1</td>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                      </tr>
+                      <tr>
+                        <td>2</td>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                      </tr>
+                      <tr>
+                        <td>3</td>
+                        <td>Larry</td>
+                        <td>the Bird</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="tabtwo2" role="tabpanel">
+                  <h1>나는 규빈이이에요 </h1>
+                  <p class="">Who formed us in his own image, and the breath of that universal love which bears and sustains us. And then, my friend.</p>
+              </div>
+              <div class="tab-pane fade" id="tabthree" role="tabpanel">
+                <p class="">In my soul and absorb its power, like the form of a beloved mistress, then I often think with longing.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <form class="form-inline">
+            <div class="input-group">
+              <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Search">
+              <div class="input-group-append"><button class="btn btn-primary" type="button"><i class="fa fa-search"></i></button></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
