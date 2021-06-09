@@ -25,7 +25,7 @@ CREATE TABLE board (
 CREATE TABLE best_customer (
     customer_id INT NOT NULL,
     best_date VARCHAR(255) NOT NULL,
-    best_rank DOUBLE,
+    best_rank INT,
 	FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
     PRIMARY KEY(customer_id, best_date)
 );
@@ -33,7 +33,7 @@ CREATE TABLE best_customer (
 CREATE TABLE best_employee(
     employee_id INT NOT NULL,
     best_date VARCHAR(255) NOT NULL,
-    best_rank DOUBLE,
+    best_rank INT,
 	FOREIGN KEY (employee_id) REFERENCES employees (employee_id),
     PRIMARY KEY(employee_id, best_date)
 );

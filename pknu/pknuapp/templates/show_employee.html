@@ -1,0 +1,68 @@
+
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+        <h2 class="">부경재고관리시스템 직원조회</h2>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Hire Date</th>
+                    <th>Job Title</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for employee in employees %}
+                <tr>
+                    <td>{{ employee.employee_id }}</td>
+                    <td>{{ employee.first_name }}</td>
+                    <td>{{ employee.last_name }}</td>
+                    <td>{{ employee.email }}</td>
+                    <td>{{ employee.phone }}</td>
+                    <td>{{ employee.hire_date }}</td>
+                    <td>{{ employee.job_title }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <nav aria-label="Page navigation" style="padding-top: 10px">
+        <ul class="pagination justify-content-center">
+          {% if employees.has_previous %}
+          <li class="page-item">
+              <a class="page-link" href="?ep={{ employees.previous_page_number }}">이전</a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#">이전</a>
+          </li>
+          {% endif %}
+          <li class="page-item">
+            <a class="page-link" href="#">{{ employees.number }} / {{ employees.paginator.num_pages }}</a>
+          </li>
+          {% if employees.has_next %}
+          <li class="page-item">
+              <a class="page-link" href="?ep={{ employees.next_page_number }}">다음</a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#">다음</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+</div>
+
+{% endblock content %}
