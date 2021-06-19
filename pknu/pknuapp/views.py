@@ -44,6 +44,25 @@ def show_employee(request):
         }
         return render(request, 'show_employee.html', res_data)
 
+def show_item(request):
+    user_id = request.session.get('user')
+    if user_id:
+        if request.method == 'GET':
+            employees_data = Employees.objects.filter().values()
+        elif request.method == "POST":
+            e_email = request.POST.get('e_email', None)
+            employees_data = Employees.objects.filter(Q(email=e_email)).values()
+
+        e_pagenator = Paginator(employees_data, 10)
+        ep = int(request.GET.get('ep', 1))
+        employees = e_pagenator.get_page(ep)
+
+        res_data = {
+            'employees':employees,
+            'employees_data':employees_data
+        }
+        return render(request, 'show_item.html', res_data)
+
 def login(request):
     if request.method == 'GET':
         return render(request, 'login.html')
