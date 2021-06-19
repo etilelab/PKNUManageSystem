@@ -131,3 +131,71 @@ def register(request):
             user = Member(email=email, passwd=make_password(password), employee_id=employee_id, created_at=datetime.datetime.now())
             user.save()
         return render(request, 'register.html', res_data)
+
+
+
+
+
+def customers(request):
+    user_id = request.session.get('user')
+    if user_id:
+        if request.method == 'GET':
+            customers_data = Customers.objects.filter().values()
+            e_pagenator = Paginator(customers_data, 10)
+            ep = int(request.GET.get('ep', 1))
+            customers = e_pagenator.get_page(ep)
+
+            res_data = {
+                'customers': customers,
+                'customers_data': customers_data
+            }
+
+            return render(request, 'customers.html', res_data)
+
+        elif request.method == 'POST':
+            search = request.POST.get("search", None)
+            customers_data = Customers.objects.filter(Q(name=search)).values() # 100
+
+            e_pagenator = Paginator(customers_data, 10)
+            ep = int(request.GET.get('ep', 1))
+            customers = e_pagenator.get_page(ep)
+            res_data = {
+                'customers':customers,
+                'customers_data':customers_data
+            }
+
+            return render(request, 'customers.html', res_data)
+
+
+
+
+    #elif request.method == 'POST':
+
+        # customers_data = Customers.objects.filter().values()
+        #
+        # e_pagenator = Paginator(customers_data, 10)
+        # ep = int(request.GET.get('ep', 1))
+        # customers = e_pagenator.get_page(ep)
+
+
+    # try:
+    #     #fcuser = Member.objects.get(email=email)
+    #
+    #     if search_target == customers_data.name:
+    #         #request.session['user'] = fcuser.email
+    #         return redirect('/')
+    #     else:
+    #         #res_data['error'] = 'Login failed'
+    # except Member.DoesNotExist:
+    #     #res_data['error'] = 'Login failed'
+
+        # res_data = {
+        #     'customers' : customers,
+        #     'customers_data' : customers_data
+        # }
+
+
+
+
+def statistics(request):
+    pass
