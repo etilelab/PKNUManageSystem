@@ -56,15 +56,14 @@ def show_item(request):
         elif request.method == "POST":
             max_price = request.POST.get('product_max', 99999)
             min_price = request.POST.get('product_min', 0)
-            print("max",max_price)
 
             product_name = request.POST.get('product_name', None)
             if product_name != "" and max_price != "" and min_price != "":
                 products_data = Products.objects.filter(Q(product_name=product_name) & Q(list_price__gte=min_price) &
                                                         Q(list_price__lte=max_price)).order_by('list_price').values()
-            elif product_name != "" and max_price != "" and min_price != "":
+            elif product_name == "" and max_price != "" and min_price != "":
                 products_data = Products.objects.filter(
-                    Q(product_name=product_name) & Q(list_price__gte=min_price) &
+                    Q(list_price__gte=min_price) &
                     Q(list_price__lte=max_price)).order_by('list_price').values()
             elif product_name != "" and max_price != "" and min_price != "":
                 products_data = Products.objects.filter(
