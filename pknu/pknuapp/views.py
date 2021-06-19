@@ -16,23 +16,24 @@ import datetime
 
 # Create your views here.
 
-
 def index(request):
     # 로그인 여부 확인
     user_id = request.session.get('user')
-    # row query (쌩 쿼리 select *from XXXXXX)
-    # if user_id:
-    #
-    # else:
-
-    res_data = {'test':'test'}
-    return render(request, 'index.html', res_data)
-
+    if user_id:
+        res_data = {'test':'test'}
+        return render(request, 'index.html', res_data)
+    else:
+        redirect('/login')
 
 def show_employee(request):
     user_id = request.session.get('user')
     if user_id:
-        employees_data = Employees.objects.filter().values()
+        if request.method == 'GET':
+            employees_data = Employees.objects.filter().values()
+        elif request.method == "POST":
+            e_email = request.POST.get('e_email', None)
+            employees_data = Employees.objects.filter(Q(email=e_email)).values()
+
         e_pagenator = Paginator(employees_data, 10)
         ep = int(request.GET.get('ep', 1))
         employees = e_pagenator.get_page(ep)
