@@ -46,14 +46,33 @@ def show_employee(request):
 
 def show_item(request):
     user_id = request.session.get('user')
+    product_name=""
+    min_price=0
+    max_price=999999
+
     if user_id:
         if request.method == 'GET':
             products_data = Products.objects.filter().values()
         elif request.method == "POST":
-            max_price = request.POST.get('product_max', None)
-            min_price = request.POST.get('product_min', None)
+            max_price = request.POST.get('product_max', 99999)
+            min_price = request.POST.get('product_min', 0)
+            print("max",max_price)
 
-            products_data = Products.objects.filter(Q(email=e_email)).values()
+            product_name = request.POST.get('product_name', None)
+            if product_name != "" and max_price != "" and min_price != "":
+                products_data = Products.objects.filter(Q(product_name=product_name) & Q(list_price__gte=min_price) &
+                                                        Q(list_price__lte=max_price)).order_by('list_price').values()
+            elif product_name != "" and max_price != "" and min_price != "":
+                products_data = Products.objects.filter(
+                    Q(product_name=product_name) & Q(list_price__gte=min_price) &
+                    Q(list_price__lte=max_price)).order_by('list_price').values()
+            elif product_name != "" and max_price != "" and min_price != "":
+                products_data = Products.objects.filter(
+                    Q(product_name=product_name) & Q(list_price__gte=min_price) &
+                    Q(list_price__lte=max_price)).order_by('list_price').values()
+            else:
+                products_data = Products.objects.filter(Q(list_price__gte=min_price) &
+                                                        Q(list_price__lte=max_price)).order_by('list_price').values()
 
         pagenator = Paginator(products_data, 10)
         p = int(request.GET.get('p', 1))
@@ -61,7 +80,10 @@ def show_item(request):
 
         res_data = {
             'products':products,
-            'products_data':products_data
+            'products_data':products_data,
+            'product_name':product_name,
+            'product_min':min_price,
+            'product_max':max_price,
         }
         return render(request, 'show_item.html', res_data)
 

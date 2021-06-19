@@ -38,9 +38,10 @@
 
       <div class="row" style="margin-bottom: 10px">
          <div class="col-12">
-          <form class="form-inline">
+          <!--<form class="form-inline" method="POST" action="{% url 'showitem' %}">-->
+             <form class="form-inline" method="POST" action="{% url 'showitem' %}">
+              {% csrf_token %}
               <input type="hidden" id="hidden_category_id" class="hidden_category_id" name="hidden_category_id"/>
-
               <input type="text" style="margin-right: 5px" class="form-control" id="product_name" name="product_name" placeholder="제품명">
               <input type="number" style="margin-right: 5px" class="form-control" id="product_min" name="product_min" placeholder="1000"> ~<input name="product_max" type="number" class="form-control" id="product_max" placeholder="10000">
             <button type="submit" style="margin-right: 5px" class="btn btn-primary ">검색</button>
@@ -82,9 +83,17 @@
           <nav aria-label="Page navigation" style="padding-top: 10px">
             <ul class="pagination justify-content-center">
               {% if products.has_previous %}
+
               <li class="page-item">
-                  <a class="page-link" href="?p={{ products.previous_page_number }}">이전</a>
+                  <form action="?p={{ products.previous_page_number }}" method="post">
+                        {% csrf_token %}
+                      <input type="hidden" value="{{ product_name }}" name="product_name">
+                      <input type="hidden" value="{{ product_min }}" name="product_min">
+                      <input type="hidden" value="{{ product_max }}" name="product_max">
+                        <button class="page-link" type="submit">이전</button>
+                    </form>
               </li>
+
               {% else %}
               <li class="page-item disabled">
                 <a class="page-link" href="#">이전</a>
@@ -95,7 +104,13 @@
               </li>
               {% if products.has_next %}
               <li class="page-item">
-                  <a class="page-link" href="?p={{ products.next_page_number }}">다음</a>
+                  <form action="?p={{ products.next_page_number }}" method="post">
+                        {% csrf_token %}
+                      <input type="hidden" value="{{ product_name }}" name="product_name">
+                      <input type="hidden" value="{{ product_min }}" name="product_min">
+                      <input type="hidden" value="{{ product_max }}" name="product_max">
+                        <button class="page-link" type="submit">다음</button>
+                    </form>
               </li>
               {% else %}
               <li class="page-item disabled">
