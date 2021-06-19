@@ -48,18 +48,19 @@ def show_item(request):
     user_id = request.session.get('user')
     if user_id:
         if request.method == 'GET':
-            employees_data = Employees.objects.filter().values()
+            products_data = Products.objects.filter().values()
         elif request.method == "POST":
             e_email = request.POST.get('e_email', None)
-            employees_data = Employees.objects.filter(Q(email=e_email)).values()
 
-        e_pagenator = Paginator(employees_data, 10)
-        ep = int(request.GET.get('ep', 1))
-        employees = e_pagenator.get_page(ep)
+            products_data = Products.objects.filter(Q(email=e_email)).values()
+
+        pagenator = Paginator(products_data, 10)
+        p = int(request.GET.get('p', 1))
+        products = pagenator.get_page(p)
 
         res_data = {
-            'employees':employees,
-            'employees_data':employees_data
+            'products':products,
+            'products_data':products_data
         }
         return render(request, 'show_item.html', res_data)
 

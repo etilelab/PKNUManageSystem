@@ -39,8 +39,8 @@
       <div class="row" style="margin-bottom: 10px">
          <div class="col-12">
           <form class="form-inline">
-              <input type="text" class="form-control"  id="" placeholder=~원> ~
-              <input type="text" class="form-control" id="" placeholder="~원">
+              <input type="text" style="margin-right: 5px" class="form-control" id="" placeholder="제품명">
+              <input type="text" style="margin-right: 5px" class="form-control" id="" placeholder="~원"> ~<input type="text" class="form-control" id="" placeholder="~원">
             <button type="submit" style="margin-right: 5px" class="btn btn-primary ">검색</button>
           </form>
         </div>
@@ -52,25 +52,26 @@
             <table class="table">
               <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Hire Date</th>
-                    <th>Job Title</th>
+                    <th>ID</th>
+                    <th>제품명</th>
+                    <th>제품설명</th>
+                    <th>가격<small>(직원할인가)</small></th>
+                    <th>카테고리</th>
+                    <th>재고현황</th>
+                    <th>좋아요</th>
+                    <th>기타</th>
                 </tr>
               </thead>
               <tbody>
-              {% for employee in employees %}
+              {% for product in products %}
                 <tr>
-                    <td>{{ employee.employee_id }}</td>
-                    <td>{{ employee.first_name }}</td>
-                    <td>{{ employee.last_name }}</td>
-                    <td>{{ employee.email }}</td>
-                    <td>{{ employee.phone }}</td>
-                    <td>{{ employee.hire_date }}</td>
-                    <td>{{ employee.job_title }}</td>
+                    <td>{{ product.product_id }}</td>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.description }}</td>
+                    <td>{{ product.list_price }} <small>{{ product.discount_price }}</small></td>
+                    <td>{{ product.category_id }}</td>
+                    <td>{{ product.likes }}</td>
+                    <td>좋아요</td>
                 </tr>
               {% endfor %}
               </tbody>
