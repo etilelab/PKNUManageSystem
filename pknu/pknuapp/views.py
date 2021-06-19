@@ -50,7 +50,8 @@ def show_item(request):
         if request.method == 'GET':
             products_data = Products.objects.filter().values()
         elif request.method == "POST":
-            e_email = request.POST.get('e_email', None)
+            max_price = request.POST.get('product_max', None)
+            min_price = request.POST.get('product_min', None)
 
             products_data = Products.objects.filter(Q(email=e_email)).values()
 

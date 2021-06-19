@@ -39,8 +39,10 @@
       <div class="row" style="margin-bottom: 10px">
          <div class="col-12">
           <form class="form-inline">
-              <input type="text" style="margin-right: 5px" class="form-control" id="" placeholder="제품명">
-              <input type="text" style="margin-right: 5px" class="form-control" id="" placeholder="~원"> ~<input type="text" class="form-control" id="" placeholder="~원">
+              <input type="hidden" id="hidden_category_id" class="hidden_category_id" name="hidden_category_id"/>
+
+              <input type="text" style="margin-right: 5px" class="form-control" id="product_name" name="product_name" placeholder="제품명">
+              <input type="number" style="margin-right: 5px" class="form-control" id="product_min" name="product_min" placeholder="1000"> ~<input name="product_max" type="number" class="form-control" id="product_max" placeholder="10000">
             <button type="submit" style="margin-right: 5px" class="btn btn-primary ">검색</button>
           </form>
         </div>
@@ -48,7 +50,7 @@
 
         <div class="row">
             <div class="col-12">
-          <div class="table-responsive">
+          <div class="table-responsive table-hover">
             <table class="table">
               <thead>
                 <tr>
@@ -57,9 +59,9 @@
                     <th>제품설명</th>
                     <th>가격<small>(직원할인가)</small></th>
                     <th>카테고리</th>
-                    <th>재고현황</th>
                     <th>좋아요</th>
-                    <th>기타</th>
+                    <th>상세보기</th>
+
                 </tr>
               </thead>
               <tbody>
@@ -68,10 +70,10 @@
                     <td>{{ product.product_id }}</td>
                     <td>{{ product.product_name }}</td>
                     <td>{{ product.description }}</td>
-                    <td>{{ product.list_price }} <small>{{ product.discount_price }}</small></td>
+                    <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
                     <td>{{ product.category_id }}</td>
-                    <td>{{ product.likes }}</td>
-                    <td>좋아요</td>
+                    <td>{{ product.likes }} (좋아요)</td>
+                    <td>상세보기</td>
                 </tr>
               {% endfor %}
               </tbody>
@@ -79,9 +81,9 @@
           </div>
           <nav aria-label="Page navigation" style="padding-top: 10px">
             <ul class="pagination justify-content-center">
-              {% if employees.has_previous %}
+              {% if products.has_previous %}
               <li class="page-item">
-                  <a class="page-link" href="?ep={{ employees.previous_page_number }}">이전</a>
+                  <a class="page-link" href="?p={{ products.previous_page_number }}">이전</a>
               </li>
               {% else %}
               <li class="page-item disabled">
@@ -89,11 +91,11 @@
               </li>
               {% endif %}
               <li class="page-item">
-                <a class="page-link" href="#">{{ employees.number }} / {{ employees.paginator.num_pages }}</a>
+                <a class="page-link" href="#">{{ products.number }} / {{ products.paginator.num_pages }}</a>
               </li>
-              {% if employees.has_next %}
+              {% if products.has_next %}
               <li class="page-item">
-                  <a class="page-link" href="?ep={{ employees.next_page_number }}">다음</a>
+                  <a class="page-link" href="?p={{ products.next_page_number }}">다음</a>
               </li>
               {% else %}
               <li class="page-item disabled">
@@ -124,6 +126,8 @@
 <script>
     $('#category > a').on('click', function() {
     $('#category_id').text($(this).text());
+    $('#hidden_category_id').text($(this).text());
+
     // alert($(this).attr('value'));
 });
 </script>
