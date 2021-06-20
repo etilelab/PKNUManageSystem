@@ -17,6 +17,7 @@ from django.views.decorators.http import require_POST
 
 # Create your views here.
 
+
 def index(request):
     # 로그인 여부 확인
     user_id = request.session.get('user')
@@ -25,6 +26,7 @@ def index(request):
         return render(request, 'index.html', res_data)
 
     return redirect('login')
+
 
 def show_employee(request):
     user_id = request.session.get('user')
@@ -43,7 +45,9 @@ def show_employee(request):
             'employees':employees,
             'employees_data':employees_data
         }
+
         return render(request, 'show_employee.html', res_data)
+
 
 def show_item(request):
     user_id = request.session.get('user')
@@ -52,6 +56,14 @@ def show_item(request):
     max_price=999999
 
     if user_id:
+        likes_products_data = Products.objects.filter().order_by('-likes').values()[:10]
+        views_products_data = Products.objects.filter().order_by('-views').values()[:10]
+
+        sql = "select * from (select product_id, count(*) customer_count from order_items group by product_id ) a INNER JOIN products ON products.product_id = a.product_id order by customer_count desc limit 10"
+        with connections["default"].cursor() as cursor:
+            cursor.execute(sql)
+            customer_products = cursor.fetchall()
+
         if request.method == 'GET':
             products_data = Products.objects.filter().values()
         elif request.method == "POST" :
@@ -83,8 +95,12 @@ def show_item(request):
             'product_name':product_name,
             'product_min':min_price,
             'product_max':max_price,
+            'likes_products':likes_products_data,
+            'views_products':views_products_data,
+            'customer_products':customer_products,
         }
         return render(request, 'show_item.html', res_data)
+
 
 def login(request):
     if request.method == 'GET':
