@@ -210,6 +210,9 @@ class Inventories(models.Model):
     warehouse = models.ForeignKey('Warehouses', models.DO_NOTHING)
     quantity = models.IntegerField()
 
+    def purchase(self, quantity=1):
+       self.quantity = self.quantity - quantity
+
     class Meta:
         managed = False
         db_table = 'inventories'

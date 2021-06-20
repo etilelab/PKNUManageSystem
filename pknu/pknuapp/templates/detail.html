@@ -24,7 +24,7 @@
                   </thead>
                   <tbody>
                     <tr>
-                        <td>{{ product_detail.0 }}</td>
+                        <td>{{ product_detail.2 }}</td>
                         <td>{{ product_detail.12 }}</td>
                         <td>{{ product_detail.3 }}</td>
                         <td>{{ product_detail.4 }}</td>
@@ -39,7 +39,12 @@
                             {% endif %}
                         </td>
                         <td>{{ product_detail.9 }}</td>
-                        <td>{{ product_detail.1 }}</td>
+                        <td>{% if product_detail.1 == None %}
+                            0
+                            {% else %}
+                            {{ product_detail.1 }}
+                            {% endif %}
+                        </td>
                     </tr>
                   </tbody>
                 </table>
@@ -68,17 +73,28 @@
                       {% endfor %}
                       </tbody>
                     </table>
+
                   </div>
+                {% if products|length <= 0 %}
+            <center><h5 style="color: red"><b>재고가 없습니다</b></h5></center>
+                {% endif %}
 
              <h3 class="mb-3">제품 구매하기</h3>
             <div class="col-12">
-                 <form class="form-inline" method="POST" action="{% url 'showitem' %}">
+            {% if products|length <= 0 %}
+            <center><h5 style="color: red"><b>재고가 없어 구매가 불가능합니다</b></h5></center>
+
+                {% else %}
+
+                 <form class="form-inline" method="POST" action="{% url 'buy' %}">
                   {% csrf_token %}
-                  <input type="hidden" id="hidden_category_id" class="hidden_category_id" name="hidden_category_id"/>
-                  <input type="text" style="margin-right: 5px" class="form-control" id="product_name" name="product_name" placeholder="제품명">
-                  <input type="number" style="margin-right: 5px" class="form-control" id="product_min" name="product_min" placeholder="1000"> ~<input name="product_max" type="number" class="form-control" id="product_max" placeholder="10000">
-                <button type="submit" style="margin-right: 5px" class="btn btn-primary ">검색</button>
+                  <input type="hidden" id="productid" class="productid" name="productid" value="{{ product_detail.2 }}"/>
+                     <input type="hidden" id="product_price" class="product_price" name="product_price" value="{{ product_detail.6 }}"/>
+                  <input type="text" style="margin-right: 5px" class="form-control" id="warehouse_name" name="warehouse_name" placeholder="재고창고명">
+                  <input type="number" style="margin-right: 5px" class="form-control" id="quantity" name="quantity" placeholder="수량">
+                <button type="submit" style="margin-right: 5px" class="btn btn-primary ">구매</button>
               </form>
+                {% endif %}
             </div>
         </div>
       </div>

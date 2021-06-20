@@ -108,7 +108,7 @@ def detail(request):
     if user_id:
         product_id = request.GET.get('product_id', None)
 
-        sql = "select * from (select * from (select product_id p, count(*) customer_count from order_items group by p ) a INNER JOIN products ON products.product_id = a.p) b INNER JOIN product_categories c ON c.category_id = b.category_id where b.product_id = " + str(product_id)
+        sql = "select * from (select * from (select product_id p, count(*) customer_count from order_items group by p ) a RIGHT JOIN products ON products.product_id = a.p) b INNER JOIN product_categories c ON c.category_id = b.category_id where b.product_id = " + str(product_id)
         with connections["default"].cursor() as cursor:
             cursor.execute(sql)
             product_detail = cursor.fetchall()[0]
@@ -183,6 +183,46 @@ def like(request):
     likes = products_data.likes
     context = {'likes_count':likes}
     return HttpResponse(json.dumps(context), content_type="application/json")
+
+def buy(request):
+    user_id = request.session.get('user')
+    employee_id = Member.objects.get(email=user_id).employee_id
+
+    product_id = request.POST.get('productid', None)
+    warehouse_name = request.POST.get('warehouse_name', None)
+    product_price = request.POST.get('product_price', None)
+    quantity = request.POST.get('quantity', None)
+
+    if product_id != "" and warehouse_name != "" and product_price != "" and quantity != "":
+        quantity = float(quantity)
+        product_price = float(product_price)
+
+        warehouse_id = Warehouses.objects.get(warehouse_name=warehouse_name).warehouse_id
+        credit_limit = Employees.objects.get(employee_id=employee_id).credit_limit
+        remain_quantity = float(Inventories.objects.get(Q(warehouse_id=warehouse_id) & Q(product_id=product_id)).quantity)
+
+        if quantity < remain_quantity and quantity*product_price < credit_limit:
+            buy_time = datetime.datetime.now()
+            new_order_id = Orders.objects.all().order_by('-order_id')[0].order_id + 1
+
+            Orders.objects.create(salesman_id =employee_id, status="Pending", employee_order=1, order_date=buy_time, order_id=new_order_id)
+            OrderItems.objects.create(item_id =1, order_id=new_order_id, product_id=product_id, quantity=quantity, unit_price=product_price)
+
+            sql = "update inventories set quantity=" + str(remain_quantity-quantity) + " where warehouse_id=" + str(warehouse_id) + " and product_id=" + str(product_id) + ""
+            with connections["default"].cursor() as cursor:
+                cursor.execute(sql)
+
+            message = "성공적으로 주문을 진행하였습니다. 구매완료!"
+        elif quantity > remain_quantity:
+            message = "재고가 부족합니다."
+        elif quantity*product_price > credit_limit:
+            message = "현금이 부족합니다. 현금을 추가로 결제해주세요."
+        else:
+            message = "주문에 실패하였습니다"
+
+        res_data = {"message":message}
+
+    return render(request, 'buy.html', res_data)
 
 
 def customers(request):

@@ -75,7 +75,7 @@
                     <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
                     <td>{{ product.category_id }}</td>
                     <td><label id="count-{{ product.product_id }}">{{ product.likes }}</label> <button name="{{ product.product_id }}" class="btn btn-primary like">좋아요</button></td>
-                    <td><button class="btn btn-primary">상세보기</button></td>
+                    <td><button onclick="location.href='detail?product_id={{ product.product_id }}'" class="btn btn-primary">상세보기</button></td>
                 </tr>
               {% endfor %}
               </tbody>
