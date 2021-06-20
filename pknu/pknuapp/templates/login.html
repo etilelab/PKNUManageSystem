@@ -14,11 +14,13 @@
             <div class="form-group"> <label>비밀번호</label>
               <input name="password" id="password" type="password" class="form-control" placeholder="비밀번호"> </div>
             <button type="submit" class="btn btn-primary">로그인</button>
+            <button type="button" class="btn btn-primary" onclick="location.href='register'">회원가입</button>
+            <p style="padding-top: 10px" class="text-danger"><b>{{ error }}</b></p>
           </form>
         </div>
+
       </div>
     </div>
 </div>
-
 
 {% endblock content %}

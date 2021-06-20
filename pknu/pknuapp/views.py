@@ -13,6 +13,7 @@ from django.db.models.functions import Cast
 from django.db import connections
 import time
 import datetime
+from django.views.decorators.http import require_POST
 
 # Create your views here.
 
@@ -20,10 +21,10 @@ def index(request):
     # 로그인 여부 확인
     user_id = request.session.get('user')
     if user_id:
-        res_data = {'test':'test'}
+        res_data = {'user_id': user_id}
         return render(request, 'index.html', res_data)
-    else:
-        redirect('/login')
+
+    return redirect('login')
 
 def show_employee(request):
     user_id = request.session.get('user')
@@ -53,7 +54,8 @@ def show_item(request):
     if user_id:
         if request.method == 'GET':
             products_data = Products.objects.filter().values()
-        elif request.method == "POST":
+        elif request.method == "POST" :
+
             max_price = request.POST.get('product_max', 99999)
             min_price = request.POST.get('product_min', 0)
 
@@ -64,14 +66,12 @@ def show_item(request):
             elif product_name == "" and max_price != "" and min_price != "":
                 products_data = Products.objects.filter(
                     Q(list_price__gte=min_price) &
-                    Q(list_price__lte=max_price)).order_by('list_price').values()
-            elif product_name != "" and max_price != "" and min_price != "":
+                    Q(list_price__lte=max_price)).order_by('-list_price').values()
+            elif product_name != "" and max_price == "" and min_price == "":
                 products_data = Products.objects.filter(
-                    Q(product_name=product_name) & Q(list_price__gte=min_price) &
-                    Q(list_price__lte=max_price)).order_by('list_price').values()
+                    Q(product_name=product_name)).order_by('-list_price').values()
             else:
-                products_data = Products.objects.filter(Q(list_price__gte=min_price) &
-                                                        Q(list_price__lte=max_price)).order_by('list_price').values()
+                products_data = Products.objects.filter().order_by('-list_price').values()
 
         pagenator = Paginator(products_data, 10)
         p = int(request.GET.get('p', 1))
@@ -94,7 +94,7 @@ def login(request):
         password = request.POST.get('password', None)
         res_data = {}
         if not (email and password):
-            res_data['error'] = 'Login failed'
+            res_data['error'] = '로그인 실패'
         else:
             try:
                 fcuser = Member.objects.get(email=email)
@@ -102,16 +102,16 @@ def login(request):
                     request.session['user'] = fcuser.email
                     return redirect('/')
                 else:
-                    res_data['error'] = 'Login failed'
+                    res_data['error'] = '로그인 실패'
             except Member.DoesNotExist:
-                res_data['error'] = 'Login failed'
+                res_data['error'] = '로그인 실패'
         return render(request, 'login.html', res_data)
 
 
 def logout(request):
     if request.session.get('user'):
         del(request.session['user'])
-    return redirect('/')
+    return redirect('login')
 
 
 def register(request):
@@ -132,8 +132,19 @@ def register(request):
             user.save()
         return render(request, 'register.html', res_data)
 
+def board(request):
+    pass
 
+@require_POST
+def like(request):
+    product_id = request.POST.get('productid', None)
+    products_data = Products.objects.get(Q(product_id=product_id))
+    products_data.likes = products_data.likes + 1
+    products_data.save()
 
+    likes = products_data.likes
+    context = {'likes_count':likes}
+    return HttpResponse(json.dumps(context), content_type="application/json")
 
 
 def customers(request):
