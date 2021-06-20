@@ -11,4 +11,5 @@ urlpatterns = [
     path('logout',views.logout, name='logout'),
     path('board',views.board, name='board'),
     path('like/',views.like, name='like'),
+    path('detail',views.detail, name='detail'),
 ]

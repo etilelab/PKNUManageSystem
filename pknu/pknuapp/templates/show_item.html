@@ -27,11 +27,11 @@
             <div class="dropdown-menu" id="category">
                 <a class="dropdown-item" href="#">전체 카테고리</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">카테고리 1</a>
-                <a class="dropdown-item" href="#">카테고리 2</a>
-                <a class="dropdown-item" href="#">카테고리 3</a>
-                <a class="dropdown-item" href="#">카테고리 4</a>
-                <a class="dropdown-item" href="#">카테고리 5</a>
+              <a class="dropdown-item" href="#">1 (CPU)</a>
+                <a class="dropdown-item" href="#">2 (Video Card)</a>
+                <a class="dropdown-item" href="#">3 (Ram)</a>
+                <a class="dropdown-item" href="#">4 (Mother Board)</a>
+                <a class="dropdown-item" href="#">5 (Storage)</a>
             </div>
           </div>
         </div>
@@ -75,7 +75,7 @@
                     <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
                     <td>{{ product.category_id }}</td>
                     <td><label id="count-{{ product.product_id }}">{{ product.likes }}</label> <button name="{{ product.product_id }}" class="btn btn-primary like">좋아요</button></td>
-                    <td>상세보기</td>
+                    <td><button class="btn btn-primary">상세보기</button></td>
                 </tr>
               {% endfor %}
               </tbody>
@@ -186,11 +186,12 @@
                             <td>{{ product.description }}</td>
                             <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
                             <td>{{ product.category_id }}</td>
-                            <td>
                                 {% if product.likes > 5 %}
-                                <label style="color: red"><strong>{{ product.likes }}</strong></label>
+                                <td style="background-color: coral">
+                            <label style="color: whitesmoke"><strong>{{ product.likes }}</strong></label></td>
                                 {% else %}
-                                <label>{{ product.likes }}</label>
+                            <td>
+                                <label>{{ product.likes }}</label></td>
                                 {% endif %}
                             </td>
                             <td>{{ product.views }}</td>
@@ -251,8 +252,7 @@
 <script>
     $('#category > a').on('click', function() {
     $('#category_id').text($(this).text());
-    $('#hidden_category_id').text($(this).text());
-
+     $("input[name=hidden_category_id]").val($(this).text());
     // alert($(this).attr('value'));
 });
 </script>

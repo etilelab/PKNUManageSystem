@@ -70,6 +70,7 @@ def show_item(request):
 
             max_price = request.POST.get('product_max', 99999)
             min_price = request.POST.get('product_min', 0)
+            category_id = request.POST.get('hidden_category_id',0)
 
             product_name = request.POST.get('product_name', None)
             if product_name != "" and max_price != "" and min_price != "":
@@ -100,6 +101,27 @@ def show_item(request):
             'customer_products':customer_products,
         }
         return render(request, 'show_item.html', res_data)
+
+
+def detail(request):
+    user_id = request.session.get('user')
+    if user_id:
+        product_id = request.GET.get('product_id', None)
+
+        sql = "select * from (select * from (select product_id p, count(*) customer_count from order_items group by p ) a INNER JOIN products ON products.product_id = a.p) b INNER JOIN product_categories c ON c.category_id = b.category_id where b.product_id = " + str(product_id)
+        with connections["default"].cursor() as cursor:
+            cursor.execute(sql)
+            product_detail = cursor.fetchall()[0]
+
+        sql = "select * from inventories a , warehouses b, locations c where a.product_id = " + str(product_id) +" and a.warehouse_id = b.warehouse_id and c.location_id = b.location_id "
+        with connections["default"].cursor() as cursor:
+            cursor.execute(sql)
+            products = cursor.fetchall()
+
+        print(sql)
+
+        res_data = {'product_detail':product_detail,'products':products}
+        return render(request, 'detail.html', res_data)
 
 
 def login(request):
