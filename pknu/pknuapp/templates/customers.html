@@ -13,10 +13,9 @@
               <li class="nav-item"> <a class="nav-link" href="" data-toggle="tab" data-target="#tabtwo2">지역별 조회</a> </li>
             </ul>
             <div class="tab-content mt-2">
-              <div class="tab-pane fade show active" id="tabone" role="tabpanel">
-                <p class="">When I hear the buzz of the little world among the stalks, and grow familiar with the countless indescribable forms.</p>
 
-                <form action="{% url 'customers' %}" method="POST" class="form-inline" style="margin-bottom: 20px">
+              <div class="tab-pane fade show active" id="tabone" role="tabpanel">
+               <form action="{% url 'customers' %}" method="POST" class="form-inline" style="margin-bottom: 20px">
                   {% csrf_token %}
                   <div class="input-group">
                     <input type="text" class="form-control" id="search" name="search" placeholder="검색">
@@ -25,15 +24,15 @@
                 </form>
 
                 <div class="table-responsive">
-                  <table class="table">
+                  <table class="table table-hover">
                     <thead>
                       <tr>
-                        <th>customer_id</th>
-                        <th>name</th>
-                        <th>address</th>
-                        <th>website</th>
-                        <th>credit_limit</th>
-                        <th>city</th>
+                        <th>고객 아이디</th>
+                        <th>이름</th>
+                        <th>주소</th>
+                        <th>사이트</th>
+                        <th>구매 상한</th>
+                        <th>거주 도시</th>
                         <th>구입 내역</th>
                         <th>제품별 구입 횟수</th>
                       </tr>
@@ -48,10 +47,10 @@
                           <td>{{ customer.credit_limit }}</td>
                           <td>{{ customer.city }}</td>
                           <td>
-                            <button type="button" class="show-orders btn btn-primary" name="button" style="height:20px font-size:10px">
+                            <button data-toggle="modal" data-target="#testModal_{{ forloop.counter }}" type="button" id="show-orders" class="show-orders btn btn-primary" name="show-orders" style="height:20px font-size:10px">
                               구입 내역
                             </button>
-                            <div class="modal fade" id="testModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal fade" id="testModal_{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                               <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                   <div class="modal-header">
@@ -60,7 +59,7 @@
                                       <span aria-hidden="true">X</span>
                                     </button>
                                   </div>
-                                  <div class="modal-body">내용 입력</div>
+                                  <div class="modal-body">내용 입력 {{ forloop.counter }}</div>
                                   <div class="modal-footer">
                                     <a class=btn" id="modalY" href="#">예</a>
                                     <button class="btn" type="button" data-dismiss="modal">아니요</button>
@@ -80,33 +79,34 @@
                   </table>
                 </div>
               </div>
+
+
               <div class="tab-pane fade" id="tabtwo2" role="tabpanel">
-                  <p class="">When I hear the buzz of the little world among the stalks, and grow familiar with the countless indescribable forms.</p>
 
                 <form action="{% url 'customers' %}" method="POST" class="form-inline" style="margin-bottom: 20px">
                   {% csrf_token %}
                   <div class="input-group">
-                    <input type="text" class="form-control" id="search" name="search" placeholder="검색">
+                    <input type="text" class="form-control" id="city_search" name="city_search" placeholder="검색">
                     <div class="input-group-append"><button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button></div>
                   </div>
                 </form>
 
                 <div class="table-responsive">
-                  <table class="table">
+                  <table class="table table-hover">
                     <thead>
                       <tr>
-                        <th>customer_id</th>
-                        <th>name</th>
-                        <th>address</th>
-                        <th>website</th>
-                        <th>credit_limit</th>
-                        <th>city</th>
+                        <th>고객 아이디</th>
+                        <th>이름</th>
+                        <th>주소</th>
+                        <th>사이트</th>
+                        <th>구매 상한</th>
+                        <th>거주 도시</th>
                         <th>구입 내역</th>
                         <th>제품별 구입 횟수</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {% for customer in customers %}
+                      {% for customer in city_customers %}
                         <tr>
                           <td>{{ customer.customer_id }}</td>
                           <td>{{ customer.name }}</td>
@@ -115,7 +115,7 @@
                           <td>{{ customer.credit_limit }}</td>
                           <td>{{ customer.city }}</td>
                           <td>
-                            <button type="button" class="show-orders btn btn-primary" name="button">
+                            <button type="button" id ="c_show-orders" class="c_show-orders btn btn-primary" name="c_show-orders" >
                               구입 내역
                             </button>
                           </td>
@@ -129,37 +129,48 @@
                     </tbody>
                   </table>
                 </div>
+                <nav aria-label="Page navigation" style="padding-top: 10px">
+                  <ul class="pagination justify-content-center">
+                    {% if city_customers.has_previous %}
+                    <li class="page-item">
+                        <form action="?cp={{ city_customers.previous_page_number }}" method="post">
+                              {% csrf_token %}
+                            <input type="hidden" value="{{ city_search }}" name="city_search">
+                              <button class="page-link" type="submit">이전</button>
+                          </form>
+                    </li>
+
+                    {% else %}
+                    <li class="page-item disabled">
+                      <a class="page-link" href="#">이전</a>
+                    </li>
+                    {% endif %}
+                    <li class="page-item">
+                      <a class="page-link" href="#">{{ city_customers.number }} / {{ city_customers.paginator.num_pages }}</a>
+                    </li>
+                    {% if city_customers.has_next %}
+                    <li class="page-item">
+                        <form action="?cp={{ city_customers.next_page_number }}" method="post">
+                              {% csrf_token %}
+                            <input type="hidden" value="{{ city_search }}" name="city_search">
+                              <button class="page-link" type="submit">다음</button>
+                          </form>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                      <a class="page-link" href="#">다음</a>
+                    </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+
               </div>
             </div>
           </div>
         </div>
 
       </div>
-      <nav aria-label="Page navigation" style="padding-top: 10px">
-        <ul class="pagination justify-content-center">
-          {% if employees.has_previous %}
-          <li class="page-item">
-              <a class="page-link" href="?ep={{ customers.previous_page_number }}">이전</a>
-          </li>
-          {% else %}
-          <li class="page-item disabled">
-            <a class="page-link" href="#">이전</a>
-          </li>
-          {% endif %}
-          <li class="page-item">
-            <a class="page-link" href="#">{{ customers.number }} / {{ customers.paginator.num_pages }}</a>
-          </li>
-          {% if customers.has_next %}
-          <li class="page-item">
-              <a class="page-link" href="?ep={{ customers.next_page_number }}">다음</a>
-          </li>
-          {% else %}
-          <li class="page-item disabled">
-            <a class="page-link" href="#">다음</a>
-          </li>
-          {% endif %}
-        </ul>
-      </nav>
+
     </div>
   </div>
 
@@ -167,7 +178,7 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 
 <script>
-  $('#testBtn').click(function(e){
+  $('#show-orders').click(function(e){
     e.preventDefault();
     $('#testModal').modal("show");
   });

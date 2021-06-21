@@ -68,14 +68,11 @@
           </div>
           <nav aria-label="Page navigation" style="padding-top: 10px">
             <ul class="pagination justify-content-center">
-              {% if products.has_previous %}
-
+              {% if city_customers.has_previous %}
               <li class="page-item">
-                  <form action="?p={{ products.previous_page_number }}" method="post">
+                  <form action="?cp={{ city_customers.previous_page_number }}" method="post">
                         {% csrf_token %}
-                      <input type="hidden" value="{{ product_name }}" name="product_name">
-                      <input type="hidden" value="{{ product_min }}" name="product_min">
-                      <input type="hidden" value="{{ product_max }}" name="product_max">
+                      <input type="hidden" value="{{ city_search }}" name="city_search">
                         <button class="page-link" type="submit">이전</button>
                     </form>
               </li>
@@ -86,15 +83,13 @@
               </li>
               {% endif %}
               <li class="page-item">
-                <a class="page-link" href="#">{{ products.number }} / {{ products.paginator.num_pages }}</a>
+                <a class="page-link" href="#">{{ city_customers.number }} / {{ city_customers.paginator.num_pages }}</a>
               </li>
-              {% if products.has_next %}
+              {% if city_customers.has_next %}
               <li class="page-item">
-                  <form action="?p={{ products.next_page_number }}" method="post">
+                  <form action="?cp={{ city_customers.next_page_number }}" method="post">
                         {% csrf_token %}
-                      <input type="hidden" value="{{ product_name }}" name="product_name">
-                      <input type="hidden" value="{{ product_min }}" name="product_min">
-                      <input type="hidden" value="{{ product_max }}" name="product_max">
+                      <input type="hidden" value="{{ city_search }}" name="city_search">
                         <button class="page-link" type="submit">다음</button>
                     </form>
               </li>
@@ -105,6 +100,7 @@
               {% endif %}
             </ul>
           </nav>
+
             </div>
         </div>
 

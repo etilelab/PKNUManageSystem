@@ -230,6 +230,11 @@ def customers(request):
             ep = int(request.GET.get('ep', 1))
             customers = e_pagenator.get_page(ep)
 
+            city_customers_data = Customers.objects.filter().values()
+            c_pagenator = Paginator(customers_data, 10)
+            ep = int(request.GET.get('ep', 1))
+            customers = e_pagenator.get_page(ep)
+
             res_data = {
                 'customers': customers,
                 'customers_data': customers_data
@@ -238,46 +243,50 @@ def customers(request):
             return render(request, 'customers.html', res_data)
 
         elif request.method == 'POST':
-            search = request.POST.get("search", None)
-            customers_data = Customers.objects.filter(Q(name=search)).values() # 100
 
+
+            search = request.POST.get("search", None)
+            city_search = request.POST.get("city_search", None)
+
+            if search != None:
+                customers_data = Customers.objects.filter(Q(name=search)).values()
+            else:
+                customers_data = Customers.objects.filter().values()
+
+            if city_search != None:
+                city_customers_data = Customers.objects.filter(Q(city=city_search)).values()
+            else:
+                city_customers_data = Customers.objects.filter().values()
+
+
+            with connections["default"].cursor() as cursor:
+                cursor.execute(
+                    "select *from ("
+                    "select name, status, order_id, salesman_id,"
+                    "order_date from customers INNER JOIN orders ON customers.customer_id = orders.customer_id WHERE customers.customer_id = 1) a INNER JOIN"
+                    " (select product_name, order_id from order_items INNER JOIN "
+                    "products ON products.product_id = order_items.product_id) b ON a.order_id = b.order_id")
+                row = cursor.fetchall()
+            print(row)
+            # [a,a,a,a,a,b,b,b,b,b,c,c,c,c,c,]
+            # [ [a,a,a,a,a], [b,b,b,b,b,b,],[c,c,c,c,c]]
             e_pagenator = Paginator(customers_data, 10)
             ep = int(request.GET.get('ep', 1))
             customers = e_pagenator.get_page(ep)
+
+            c_pagenator = Paginator(city_customers_data, 10)
+            cp = int(request.GET.get('cp', 1))
+            city_customers = c_pagenator.get_page(cp)
+
             res_data = {
                 'customers':customers,
-                'customers_data':customers_data
+                'city_customers': city_customers,
+                'customers_data':customers_data,
+                'city_customers_data':city_customers_data,
+                'city_search':city_search
             }
 
             return render(request, 'customers.html', res_data)
-
-
-
-
-    #elif request.method == 'POST':
-
-        # customers_data = Customers.objects.filter().values()
-        #
-        # e_pagenator = Paginator(customers_data, 10)
-        # ep = int(request.GET.get('ep', 1))
-        # customers = e_pagenator.get_page(ep)
-
-
-    # try:
-    #     #fcuser = Member.objects.get(email=email)
-    #
-    #     if search_target == customers_data.name:
-    #         #request.session['user'] = fcuser.email
-    #         return redirect('/')
-    #     else:
-    #         #res_data['error'] = 'Login failed'
-    # except Member.DoesNotExist:
-    #     #res_data['error'] = 'Login failed'
-
-        # res_data = {
-        #     'customers' : customers,
-        #     'customers_data' : customers_data
-        # }
 
 
 
