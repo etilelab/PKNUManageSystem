@@ -1,0 +1,132 @@
+
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+        <h2 class="">부경재고관리시스템 지역별판매관리</h2>
+          <div class="btn-group">
+            <button class="btn btn-primary dropdown-toggle" id="location_id" data-toggle="dropdown">제품 카테고리</button>
+            <div class="dropdown-menu" id="location_click">
+                <a class="dropdown-item" href="#">전체지역 (location)</a>
+              <div class="dropdown-divider"></div>
+                {% for location in locations %}
+                    <a class="dropdown-item" href="#">{{ location.location_id }}-{{ location.city }}</a>
+                {% endfor %}
+            </div>
+          </div>
+             <form class="form-inline" method="POST" action="{% url 'location' %}">
+                  {% csrf_token %}
+                  <input type="hidden" id="hidden_location_id" class="hidden_location_id" name="hidden_location_id"/>
+                <button type="submit" style="margin-top: 5px" class="btn btn-primary ">검색</button>
+              </form>
+
+        </div>
+      <div class="col-12">
+          <div class="table-responsive table-hover">
+            <table class="table">
+              <thead>
+                <tr>
+                    <th>대륙명</th>
+                    <th>나라명</th>
+                    <th>도시명</th>
+                    <th>주명</th>
+                    <th>재고창고명</th>
+                    <th>제품명</th>
+                    <th>재고수</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for product in location_data_p %}
+                <tr>
+                    <td>{{ product.0 }}</td>
+                    <td>{{ product.1 }}</td>
+                    <td>{{ product.2 }}</td>
+                    <td>{{ product.3 }}</td>
+                    <td>{{ product.4 }}</td>
+                    <td>{{ product.5 }}</td>
+                    <td>{{ product.6 }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <nav aria-label="Page navigation" style="padding-top: 10px">
+            <ul class="pagination justify-content-center">
+              {% if location_data_p.has_previous %}
+              <li class="page-item">
+                  <form action="?p={{ location_data_p.previous_page_number }}" method="post">
+                        {% csrf_token %}
+                      <input type="hidden" value="{{ hidden_location_id }}" name="hidden_location_id">
+                        <button class="page-link" type="submit">이전</button>
+                    </form>
+              </li>
+              {% else %}
+              <li class="page-item disabled">
+                <a class="page-link" href="#">이전</a>
+              </li>
+              {% endif %}
+              <li class="page-item">
+                <a class="page-link" href="#">{{ location_data_p.number }} / {{ location_data_p.paginator.num_pages }}</a>
+              </li>
+              {% if location_data_p.has_next %}
+              <li class="page-item">
+                  <form action="?p={{ location_data_p.next_page_number }}" method="post">
+                        {% csrf_token %}
+                      <input type="hidden" value="{{ hidden_location_id }}" name="hidden_location_id">
+                        <button class="page-link" type="submit">다음</button>
+                    </form>
+              </li>
+              {% else %}
+              <li class="page-item disabled">
+                <a class="page-link" href="#">다음</a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+    </div>
+          {% if location_customer != "" %}
+      <div class="col-12">
+          <h5>지역별 구매 고객 TOP 10</h5>
+          <div class="table-responsive table-hover">
+        <table class="table">
+          <thead>
+            <tr>
+                <th>구매횟수</th>
+                <th>고객명</th>
+                <th>총 구매금액</th>
+                <th>도시명</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for customer in location_customer %}
+            <tr>
+                <td>{{ customer.0 }}</td>
+                <td>{{ customer.1 }}</td>
+                <td>{{ customer.2 }}$</td>
+                <td>{{ customer.3 }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+          {% endif %}
+      </div>
+</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<script>
+    $('#location_click > a').on('click', function() {
+    $('#location_id').text($(this).text());
+     $("input[name=hidden_location_id]").val($(this).text());
+    // alert($(this).attr('value'));
+});
+</script>
+
+{% endblock content %}

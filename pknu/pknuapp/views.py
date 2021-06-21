@@ -92,7 +92,6 @@ def show_item(request):
             else:
                 products_data2 = Products.objects.filter().order_by('list_price').values()
 
-
             # 기타 검색
             if product_name != "" and max_price != "" and min_price != "":
                 products_data = Products.objects.filter(Q(product_name=product_name) & Q(list_price__gte=min_price) &
@@ -106,7 +105,6 @@ def show_item(request):
                     Q(product_name=product_name)).order_by('-list_price').values()
             else:
                 products_data = Products.objects.filter().values()
-
 
         pagenator = Paginator(products_data, 10)
         p = int(request.GET.get('p', 1))
@@ -149,11 +147,63 @@ def detail(request):
         with connections["default"].cursor() as cursor:
             cursor.execute(sql)
             products = cursor.fetchall()
+
+        sql = "update products set views=views+1 where product_id=" + str(product_id)
+        with connections["default"].cursor() as cursor:
+            cursor.execute(sql)
+
         res_data = {'user_id': user_id,'product_detail':product_detail,'products':products}
         return render(request, 'detail.html', res_data)
     else:
         return redirect('login')
 
+def location(request):
+    user_id = request.session.get('user')
+    location_id = ""
+    location_customer = ""
+    if user_id:
+        locations = Locations.objects.all()
+
+        if request.method == "GET":
+            sql = "select region_name, country_name, city, state, warehouse_name, product_name, quantity from inventories a, warehouses b , locations c, countries d, regions e, products f where a.product_id = f.product_id and a.warehouse_id = b.warehouse_id and b.location_id = c.location_id and d.country_id = c.country_id and e.region_id = d.region_id"
+            with connections["default"].cursor() as cursor:
+                cursor.execute(sql)
+                location_data = cursor.fetchall()
+
+        elif request.method == "POST":
+            location_id = request.POST.get('hidden_location_id', "")
+            if location_id != "" and location_id != "전체지역 (location)":
+                sql = "select region_name, country_name, city, state, warehouse_name, " \
+                      "product_name, quantity from inventories a, warehouses b , locations c, countries d, regions e, products f " \
+                      "where a.product_id = f.product_id and a.warehouse_id = b.warehouse_id and b.location_id = c.location_id and " \
+                      "d.country_id = c.country_id and e.region_id = d.region_id and c.location_id="+str(location_id).split('-')[0]
+                with connections["default"].cursor() as cursor:
+                    cursor.execute(sql)
+                    location_data = cursor.fetchall()
+
+                sql = "select count(*) z, name, sum(unit_price*quantity), c.city from order_items a , orders b, customers c where a.order_id = b.order_id and c.customer_id = b.customer_id and city='" + str(location_id).split('-')[1] + "' group by c.customer_id order by z desc limit 10"
+                print(sql)
+                with connections["default"].cursor() as cursor:
+                    cursor.execute(sql)
+                    location_customer = cursor.fetchall()
+
+            else:
+                sql = "select region_name, country_name, city, state, warehouse_name, product_name, quantity from inventories a, warehouses b , locations c, countries d, regions e, products f where a.product_id = f.product_id and a.warehouse_id = b.warehouse_id and b.location_id = c.location_id and d.country_id = c.country_id and e.region_id = d.region_id"
+                with connections["default"].cursor() as cursor:
+                    cursor.execute(sql)
+                    location_data = cursor.fetchall()
+
+
+        pagenator = Paginator(location_data, 10)
+        p = int(request.GET.get('p', 1))
+        location_data_p = pagenator.get_page(p)
+
+        res_data = {'user_id': user_id,'locations':locations,
+                    'location_data_p':location_data_p,'hidden_location_id':location_id,'location_customer':location_customer}
+
+        return render(request, 'location.html', res_data)
+    else:
+        return redirect('login')
 
 def login(request):
     if request.method == 'GET':
@@ -267,10 +317,15 @@ def buy(request):
 def myinfo(request):
     user_id = request.session.get('user')
     if user_id:
-
         employee_id = Member.objects.get(email=user_id).employee_id
-        employee = Employees.objects.get(employee_id=employee_id)
 
+        if request.method == 'POST':
+            cash = request.POST.get("charge_cash", None)
+            sql = "update employees set credit_limit=credit_limit + " + str(cash) + " where employee_id=" + str(employee_id)
+            with connections["default"].cursor() as cursor:
+                cursor.execute(sql)
+
+        employee = Employees.objects.get(employee_id=employee_id)
         sql ="select a.order_id, a.status, a.order_date, c.product_name, b.quantity, b.unit_price from orders a , order_items b, products c where a.employee_order=" + str(employee_id) + " and a.salesman_id=" + str(employee_id) + " and a.order_id = b.order_id and c.product_id = b.product_id order by order_id desc limit 5"
         with connections["default"].cursor() as cursor:
             cursor.execute(sql)

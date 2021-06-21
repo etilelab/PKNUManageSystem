@@ -13,8 +13,16 @@
               <li>입사일 : {{ employee.hire_date }} </li>
               <li>나의 직책 : {{ employee.job_title }} </li>
 
-                <li>나의 현금 보유량 :{{ employee.credit_limit }}  </li>
+                <li>나의 현금 보유량 :{{ employee.credit_limit }}
+                    <form class="form-inline" method="POST" action="{% url 'myinfo' %}">
+                  {% csrf_token %}
+                  <input type="number" style="margin-right: 5px" class="form-control" id="charge_cash" name="charge_cash" placeholder="충전할 현금">
+                <button type="submit" style="margin-right: 5px" class="btn btn-primary ">현금충전</button>
+              </form>
+
+                </li>
               </ul>
+
         </div>
         <div class="col-12">
             <h3>나의 최근 구매내역 (5개)</h3>

@@ -45,9 +45,9 @@
                     <th>제품설명</th>
                     <th>가격<small>(직원할인가)</small></th>
                     <th>카테고리</th>
+                    <th>조회수</th>
                     <th>좋아요</th>
                     <th>상세보기</th>
-
                 </tr>
               </thead>
               <tbody>
@@ -67,7 +67,9 @@
                     {% endif %}
 
                     <td>{{ product.category_id }}</td>
+                    <td>{{ product.views }}</td>
                     <td><label id="count-{{ product.product_id }}">{{ product.likes }}</label> <button name="{{ product.product_id }}" class="btn btn-primary like">좋아요</button></td>
+
                     <td><button onclick="location.href='detail?product_id={{ product.product_id }}'" class="btn btn-primary">상세보기</button></td>
                 </tr>
               {% endfor %}
@@ -194,7 +196,7 @@
                           <li class="page-item">
                             <a class="page-link" href="#">{{ products2.number }} / {{ products2.paginator.num_pages }}</a>
                           </li>
-                          {% if products.has_next %}
+                          {% if products2.has_next %}
                           <li class="page-item">
                               <form action="?p2={{ products2.next_page_number }}" method="post">
                                     {% csrf_token %}
@@ -247,7 +249,16 @@
                             </td>
                             {% endif %}
                             <td>{{ product.7 }}</td>
-                            <td>{{ product.8 }}</td>
+                            {% if product.8 > 10 %}
+                                <td style="background-color: coral">
+                            <label style="color: whitesmoke"><strong>{{ product.8 }}</strong></label></td>
+                                {% else %}
+                            <td>
+                                <label>{{ product.8 }}</label></td>
+                                {% endif %}
+
+
+
                             <td>{{ product.9 }}</td>
                             <td>{{ product.1 }}</td>
                         </tr>
@@ -290,7 +301,7 @@
                             {% endif %}
 
                             <td>{{ product.category_id }}</td>
-                                {% if product.likes > 5 %}
+                                {% if product.likes > 10 %}
                                 <td style="background-color: coral">
                             <label style="color: whitesmoke"><strong>{{ product.likes }}</strong></label></td>
                                 {% else %}
@@ -298,6 +309,7 @@
                                 <label>{{ product.likes }}</label></td>
                                 {% endif %}
                             </td>
+
                             <td>{{ product.views }}</td>
                         </tr>
                       {% endfor %}
@@ -338,7 +350,13 @@
                                 </td>
                             {% endif %}
                             <td>{{ product.category_id }}</td>
-                            <td>{{ product.likes }}</td>
+                            {% if product.likes > 10 %}
+                                <td style="background-color: coral">
+                            <label style="color: whitesmoke"><strong>{{ product.likes }}</strong></label></td>
+                                {% else %}
+                            <td>
+                                <label>{{ product.likes }}</label></td>
+                                {% endif %}
                             <td>{{ product.views }}</td>
                         </tr>
                       {% endfor %}
