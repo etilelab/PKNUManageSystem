@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="py-5" style="">
+    <div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3">부경재고관리시스템에 오신것을 환영합니다. {{user_id}} 님</h3>
+          <ul>
+              <li>나의 이메일 : </li>
+              <li>나의 직책 : </li>
+                <li>나의 현금 보유량 : </li>
+              </ul>
+        </div>
+        <div class="col-12">
+            <h3>나의 최근 구매내역</h3>
+        </div>
+
+      </div>
+    </div>
+</div>
+
+{% endblock content %}

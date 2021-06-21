@@ -26,9 +26,9 @@
           <li class="nav-item"> <a class="nav-link" href="">내정보보기</a> </li>
         </ul>
         {% if user_id %}
-        <a class="btn navbar-btn ml-md-2 btn-light text-dark" href="logout">로그아웃</a>
+        <a class="btn navbar-btn ml-md-2 btn-light text-dark" href="{% url 'logout' %}">로그아웃</a>
         {% else %}
-        <a class="btn navbar-btn ml-md-2 btn-light text-dark" href="login">로그인</a>
+        <a class="btn navbar-btn ml-md-2 btn-light text-dark" href="{% url 'login' %}">로그인</a>
         {% endif %}
 
       </div>

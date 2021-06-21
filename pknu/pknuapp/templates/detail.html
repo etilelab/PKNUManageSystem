@@ -38,7 +38,6 @@
                     </td>
                     {% endif %}
 
-
 <!--                        <td>{{ product_detail.6 }}$ <small>{{ product.10 }}</small></td>-->
                         <td>{{ product_detail.7 }}</td>
                             {% if product_detail.8 > 5 %}
@@ -100,7 +99,13 @@
                  <form class="form-inline" method="POST" action="{% url 'buy' %}">
                   {% csrf_token %}
                   <input type="hidden" id="productid" class="productid" name="productid" value="{{ product_detail.2 }}"/>
+
+                     {% if product_detail.6|add:"0" == product_detail.10|add:"0" %}
                      <input type="hidden" id="product_price" class="product_price" name="product_price" value="{{ product_detail.6 }}"/>
+                     {% else %}
+                     <input type="hidden" id="product_price" class="product_price" name="product_price" value="{{ product_detail.10 }}"/>
+                     {% endif %}
+
                   <input type="text" style="margin-right: 5px" class="form-control" id="warehouse_name" name="warehouse_name" placeholder="재고창고명">
                   <input type="number" style="margin-right: 5px" class="form-control" id="quantity" name="quantity" placeholder="수량">
                 <button type="submit" style="margin-right: 5px" class="btn btn-primary ">구매</button>
