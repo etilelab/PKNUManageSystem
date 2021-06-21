@@ -14,7 +14,35 @@
               </ul>
         </div>
         <div class="col-12">
-            <h3>나의 최근 구매내역</h3>
+            <h3>나의 최근 구매내역 (5개)</h3>
+            <div class="table-responsive table-hover">
+            <table class="table">
+              <thead>
+                <tr>
+                    <th>주문ID</th>
+                    <th>상태</th>
+                    <th>주문시간</th>
+                    <th>주문제품</th>
+                    <th>제품량</th>
+                    <th>구매가격</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for order in orders %}
+                <tr>
+                    <td>{{ order.0 }}</td>
+                    <td>{{ order.1 }}</td>
+                    <td>{{ order.2 }}</td>
+                    <td>{{ order.3 }}</td>
+                    <td>{{ order.4 }}</td>
+                    <td>{{ order.5 }}</td>
+
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
         </div>
 
       </div>

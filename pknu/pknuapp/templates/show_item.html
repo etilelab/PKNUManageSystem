@@ -77,7 +77,6 @@
           <nav aria-label="Page navigation" style="padding-top: 10px">
             <ul class="pagination justify-content-center">
               {% if products.has_previous %}
-
               <li class="page-item">
                   <form action="?p={{ products.previous_page_number }}" method="post">
                         {% csrf_token %}
