@@ -43,7 +43,8 @@ def show_employee(request):
 
         res_data = {
             'employees':employees,
-            'employees_data':employees_data
+            'employees_data':employees_data,
+            'user_id': user_id,
         }
 
         return render(request, 'show_employee.html', res_data)
@@ -52,8 +53,9 @@ def show_employee(request):
 def show_item(request):
     user_id = request.session.get('user')
     product_name=""
-    min_price=0
-    max_price=999999
+    min_price= ""
+    max_price=""
+    category_id = ""
 
     if user_id:
         likes_products_data = Products.objects.filter().order_by('-likes').values()[:10]
@@ -66,13 +68,30 @@ def show_item(request):
 
         if request.method == 'GET':
             products_data = Products.objects.filter().values()
-        elif request.method == "POST" :
+            products_data2 = Products.objects.filter().values()
+        elif request.method == "POST":
 
-            max_price = request.POST.get('product_max', 99999)
-            min_price = request.POST.get('product_min', 0)
-            category_id = request.POST.get('hidden_category_id',0)
+            max_price = request.POST.get('product_max', "")
+            min_price = request.POST.get('product_min', "")
+            category_id = request.POST.get('hidden_category_id',"")
 
-            product_name = request.POST.get('product_name', None)
+            # 품목별 검색
+            product_name = request.POST.get('product_name', "")
+            if category_id == "1 (CPU)":
+                products_data2 = Products.objects.filter(Q(category_id=1)).order_by('list_price').values()
+            elif category_id == "2 (Video Card)":
+                products_data2 = Products.objects.filter(Q(category_id=2)).order_by('list_price').values()
+            elif category_id == "3 (Ram)":
+                products_data2 = Products.objects.filter(Q(category_id=3)).order_by('list_price').values()
+            elif category_id == "4 (Mother Board)":
+                products_data2 = Products.objects.filter(Q(category_id=4)).order_by('list_price').values()
+            elif category_id == "5 (Storage)":
+                products_data2 = Products.objects.filter(Q(category_id=5)).order_by('list_price').values()
+            else:
+                products_data2 = Products.objects.filter().order_by('list_price').values()
+
+
+            # 기타 검색
             if product_name != "" and max_price != "" and min_price != "":
                 products_data = Products.objects.filter(Q(product_name=product_name) & Q(list_price__gte=min_price) &
                                                         Q(list_price__lte=max_price)).order_by('list_price').values()
@@ -84,21 +103,30 @@ def show_item(request):
                 products_data = Products.objects.filter(
                     Q(product_name=product_name)).order_by('-list_price').values()
             else:
-                products_data = Products.objects.filter().order_by('-list_price').values()
+                products_data = Products.objects.filter().values()
+
 
         pagenator = Paginator(products_data, 10)
         p = int(request.GET.get('p', 1))
         products = pagenator.get_page(p)
 
+        pagenator2 = Paginator(products_data2, 10)
+        p2 = int(request.GET.get('p2', 1))
+        products2 = pagenator2.get_page(p2)
+
         res_data = {
+            'user_id': user_id,
             'products':products,
+            'products2': products2,
             'products_data':products_data,
+            'products_data2': products_data2,
             'product_name':product_name,
             'product_min':min_price,
             'product_max':max_price,
             'likes_products':likes_products_data,
             'views_products':views_products_data,
             'customer_products':customer_products,
+            'hidden_category_id':category_id,
         }
         return render(request, 'show_item.html', res_data)
 
@@ -117,7 +145,7 @@ def detail(request):
         with connections["default"].cursor() as cursor:
             cursor.execute(sql)
             products = cursor.fetchall()
-        res_data = {'product_detail':product_detail,'products':products}
+        res_data = {'user_id': user_id,'product_detail':product_detail,'products':products}
         return render(request, 'detail.html', res_data)
 
 
@@ -184,10 +212,10 @@ def buy(request):
     user_id = request.session.get('user')
     employee_id = Member.objects.get(email=user_id).employee_id
 
-    product_id = request.POST.get('productid', None)
-    warehouse_name = request.POST.get('warehouse_name', None)
-    product_price = request.POST.get('product_price', None)
-    quantity = request.POST.get('quantity', None)
+    product_id = request.POST.get('productid', "")
+    warehouse_name = request.POST.get('warehouse_name', "")
+    product_price = request.POST.get('product_price', "")
+    quantity = request.POST.get('quantity', "")
 
     if product_id != "" and warehouse_name != "" and product_price != "" and quantity != "":
         quantity = float(quantity)
@@ -207,16 +235,20 @@ def buy(request):
             sql = "update inventories set quantity=" + str(remain_quantity-quantity) + " where warehouse_id=" + str(warehouse_id) + " and product_id=" + str(product_id) + ""
             with connections["default"].cursor() as cursor:
                 cursor.execute(sql)
+            sql = "update employees set credit_limit=" + str(credit_limit - product_price) + " where employee_id=" + str(employee_id)
+            with connections["default"].cursor() as cursor:
+                cursor.execute(sql)
+
 
             message = "성공적으로 주문을 진행하였습니다. 구매완료!"
         elif quantity > remain_quantity:
             message = "재고가 부족합니다."
         elif quantity*product_price > credit_limit:
-            message = "현금이 부족합니다. 현금을 추가로 결제해주세요."
+            message = "현금이 부족합니다. 현금을 추가로 결제해주세요. 현재 가지고있는 현금은 " + str(credit_limit) + "$ 입니다."
         else:
             message = "주문에 실패하였습니다"
 
-        res_data = {"message":message}
+        res_data = {"message":message,'user_id':user_id}
 
     return render(request, 'buy.html', res_data)
 

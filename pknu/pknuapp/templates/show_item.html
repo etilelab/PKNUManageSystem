@@ -27,7 +27,6 @@
                       <!--<form class="form-inline" method="POST" action="{% url 'showitem' %}">-->
                          <form class="form-inline" method="POST" action="{% url 'showitem' %}">
                           {% csrf_token %}
-                          <input type="hidden" id="hidden_category_id" class="hidden_category_id" name="hidden_category_id"/>
                           <input type="text" style="margin-right: 5px" class="form-control" id="product_name" name="product_name" placeholder="제품명">
                           <input type="number" style="margin-right: 5px" class="form-control" id="product_min" name="product_min" placeholder="1000"> ~<input name="product_max" type="number" class="form-control" id="product_max" placeholder="10000">
                         <button type="submit" style="margin-right: 5px" class="btn btn-primary ">검색</button>
@@ -57,7 +56,16 @@
                     <td>{{ product.product_id }}</td>
                     <td>{{ product.product_name }}</td>
                     <td>{{ product.description }}</td>
-                    <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
+
+                    {% if product.list_price|add:"0" == product.discount_price|add:"0" %}
+                    <td>{{ product.list_price }}$</small>
+                    </td>
+                    {% else %}
+                    <td><strike>{{ product.list_price }}$</strike>
+                        <label style="color: red"><strong>{{ product.discount_price}}$</strong></label>
+                    </td>
+                    {% endif %}
+
                     <td>{{ product.category_id }}</td>
                     <td><label id="count-{{ product.product_id }}">{{ product.likes }}</label> <button name="{{ product.product_id }}" class="btn btn-primary like">좋아요</button></td>
                     <td><button onclick="location.href='detail?product_id={{ product.product_id }}'" class="btn btn-primary">상세보기</button></td>
@@ -125,6 +133,12 @@
                         <a class="dropdown-item" href="#">5 (Storage)</a>
                     </div>
                   </div>
+                     <form class="form-inline" method="POST" action="{% url 'showitem' %}">
+                          {% csrf_token %}
+                          <input type="hidden" id="hidden_category_id" class="category_id" name="hidden_category_id"/>
+                        <button type="submit" style="margin-top: 5px" class="btn btn-primary ">검색</button>
+                      </form>
+
                 </div>
                   <div class="col-12">
                       <div class="table-responsive table-hover">
@@ -138,25 +152,64 @@
                                 <th>카테고리</th>
                                 <th>좋아요</th>
                                 <th>조회수</th>
-                                <th>고객구매수</th>
                             </tr>
                           </thead>
                           <tbody>
-                          {% for product in customer_products %}
+                          {% for product in products2 %}
                             <tr>
-                                <td>{{ product.0 }}</td>
-                                <td>{{ product.3 }}</td>
-                                <td>{{ product.4 }}</td>
-                                <td>{{ product.6 }}$ <small>{{ product.10 }}</small></td>
-                                <td>{{ product.7 }}</td>
-                                <td>{{ product.8 }}</td>
-                                <td>{{ product.9 }}</td>
-                                <td>{{ product.1 }}</td>
+                                <td>{{ product.product_id }}</td>
+                                <td>{{ product.product_name }}</td>
+                                <td>{{ product.description }}</td>
+                                {% if product.list_price|add:"0" == product.discount_price|add:"0" %}
+                                    <td>{{ product.list_price }}$</small>
+                                    </td>
+                                    {% else %}
+                                    <td><strike>{{ product.list_price }}$</strike>
+                                        <label style="color: red"><strong>{{ product.discount_price}}$</strong></label>
+                                    </td>
+                                {% endif %}
+                                <td>{{ product.category_id }}</td>
+                                <td>{{ product.likes }}</td>
+                                <td>{{ product.views }}</td>
                             </tr>
                           {% endfor %}
                           </tbody>
                         </table>
                       </div>
+
+                      <nav aria-label="Page navigation" style="padding-top: 10px">
+                        <ul class="pagination justify-content-center">
+                          {% if products2.has_previous %}
+                          <li class="page-item">
+                              <form action="?p2={{ products2.previous_page_number }}" method="post">
+                                    {% csrf_token %}
+                                  <input type="hidden" value="{{ hidden_category_id }}" name="hidden_category_id">
+                                    <button class="page-link" type="submit">이전</button>
+                                </form>
+                          </li>
+                          {% else %}
+                          <li class="page-item disabled">
+                            <a class="page-link" href="#">이전</a>
+                          </li>
+                          {% endif %}
+                          <li class="page-item">
+                            <a class="page-link" href="#">{{ products2.number }} / {{ products2.paginator.num_pages }}</a>
+                          </li>
+                          {% if products.has_next %}
+                          <li class="page-item">
+                              <form action="?p2={{ products2.next_page_number }}" method="post">
+                                    {% csrf_token %}
+                                  <input type="hidden" value="{{ hidden_category_id }}" name="hidden_category_id">
+                                    <button class="page-link" type="submit">다음</button>
+                                </form>
+                          </li>
+                          {% else %}
+                          <li class="page-item disabled">
+                            <a class="page-link" href="#">다음</a>
+                          </li>
+                          {% endif %}
+                        </ul>
+                      </nav>
                     </div>
               </div>
            </div>
@@ -186,7 +239,14 @@
                             <td>{{ product.0 }}</td>
                             <td>{{ product.3 }}</td>
                             <td>{{ product.4 }}</td>
-                            <td>{{ product.6 }}$ <small>{{ product.10 }}</small></td>
+                            {% if product.6|add:"0" == product.10|add:"0" %}
+                            <td>{{ product.6 }}$</small>
+                            </td>
+                            {% else %}
+                            <td><strike>{{ product.6 }}$</strike>
+                                <label style="color: red"><strong>{{ product.10}}$</strong></label>
+                            </td>
+                            {% endif %}
                             <td>{{ product.7 }}</td>
                             <td>{{ product.8 }}</td>
                             <td>{{ product.9 }}</td>
@@ -221,7 +281,15 @@
                             <td>{{ product.product_id }}</td>
                             <td>{{ product.product_name }}</td>
                             <td>{{ product.description }}</td>
-                            <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
+                            {% if product.list_price|add:"0" == product.discount_price|add:"0" %}
+                                <td>{{ product.list_price }}$</small>
+                                </td>
+                                {% else %}
+                                <td><strike>{{ product.list_price }}$</strike>
+                                    <label style="color: red"><strong>{{ product.discount_price}}$</strong></label>
+                                </td>
+                            {% endif %}
+
                             <td>{{ product.category_id }}</td>
                                 {% if product.likes > 5 %}
                                 <td style="background-color: coral">
@@ -262,7 +330,14 @@
                             <td>{{ product.product_id }}</td>
                             <td>{{ product.product_name }}</td>
                             <td>{{ product.description }}</td>
-                            <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
+                            {% if product.list_price|add:"0" == product.discount_price|add:"0" %}
+                                <td>{{ product.list_price }}$</small>
+                                </td>
+                                {% else %}
+                                <td><strike>{{ product.list_price }}$</strike>
+                                    <label style="color: red"><strong>{{ product.discount_price}}$</strong></label>
+                                </td>
+                            {% endif %}
                             <td>{{ product.category_id }}</td>
                             <td>{{ product.likes }}</td>
                             <td>{{ product.views }}</td>

@@ -28,7 +28,18 @@
                         <td>{{ product_detail.12 }}</td>
                         <td>{{ product_detail.3 }}</td>
                         <td>{{ product_detail.4 }}</td>
-                        <td>{{ product_detail.6 }}$ <small>{{ product.10 }}</small></td>
+
+                    {% if product_detail.6|add:"0" == product_detail.10|add:"0" %}
+                    <td>{{ product_detail.6 }}$</small>
+                    </td>
+                    {% else %}
+                    <td><strike>{{ product_detail.6 }}$</strike>
+                        <label style="color: red"><strong>{{ product_detail.10}}$</strong></label>
+                    </td>
+                    {% endif %}
+
+
+<!--                        <td>{{ product_detail.6 }}$ <small>{{ product.10 }}</small></td>-->
                         <td>{{ product_detail.7 }}</td>
                             {% if product_detail.8 > 5 %}
                             <td style="background-color: coral">
