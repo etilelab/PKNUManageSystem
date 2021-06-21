@@ -137,7 +137,7 @@ def register(request):
 
 
 
-def customers(request):
+def show_customers(request):
     user_id = request.session.get('user')
     if user_id:
         if request.method == 'GET':
@@ -156,7 +156,7 @@ def customers(request):
                 'customers_data': customers_data
             }
 
-            return render(request, 'customers.html', res_data)
+            return render(request, 'show_customers.html', res_data)
 
         elif request.method == 'POST':
 
@@ -202,10 +202,56 @@ def customers(request):
                 'city_search':city_search
             }
 
-            return render(request, 'customers.html', res_data)
+            return render(request, 'show_customers.html', res_data)
 
 
 
 
-def statistics(request):
+def show_statistics(request):
     pass
+    # user_id = request.session.get('user')
+    # if user_id:
+    #
+    #     #판매 제품별 통계
+    #     #판매 수익별 직원 통계
+    #     #지역별 제품 통계
+    #     #고객별 구매금액 통계
+    #
+    #
+    #
+    #
+    #     # 판매 제품별 통계
+    #     # 지역별 제품 통계
+    #     products_data = Products.objects.filter().values()
+    #
+    #     # e_pagenator = Paginator(customers_data, 10)
+    #     # ep = int(request.GET.get('ep', 1))
+    #     # customers = e_pagenator.get_page(ep)
+    #     #
+    #     # res_data = {
+    #     #     'customers': customers,
+    #     #     'customers_data': customers_data
+    #     # }
+    #     #
+    #     # return render(request, 'show_customers.html', res_data)
+    #
+    #
+    #
+    #
+    #     # 판매 수익별 직원 통계
+    #     employees_data = Employees.objects.filter().values()
+    #
+    #     # e_pagenator = Paginator(customers_data, 10)
+    #     # ep = int(request.GET.get('ep', 1))
+    #     # customers = e_pagenator.get_page(ep)
+    #     # products_data = Customers.objects.filter().values()
+    #     # e_pagenator = Paginator(customers_data, 10)
+    #     # ep = int(request.GET.get('ep', 1))
+    #     # customers = e_pagenator.get_page(ep)
+    #
+    #
+    #
+    #
+    #     # 고객별 구매금액 통계
+    #     customers_data = Customers.objects.filter().values()
+

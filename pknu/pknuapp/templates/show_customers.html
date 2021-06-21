@@ -15,7 +15,7 @@
             <div class="tab-content mt-2">
 
               <div class="tab-pane fade show active" id="tabone" role="tabpanel">
-               <form action="{% url 'customers' %}" method="POST" class="form-inline" style="margin-bottom: 20px">
+               <form action="{% url 'showcustomers' %}" method="POST" class="form-inline" style="margin-bottom: 20px">
                   {% csrf_token %}
                   <div class="input-group">
                     <input type="text" class="form-control" id="search" name="search" placeholder="검색">
@@ -83,7 +83,7 @@
 
               <div class="tab-pane fade" id="tabtwo2" role="tabpanel">
 
-                <form action="{% url 'customers' %}" method="POST" class="form-inline" style="margin-bottom: 20px">
+                <form action="{% url 'showcustomers' %}" method="POST" class="form-inline" style="margin-bottom: 20px">
                   {% csrf_token %}
                   <div class="input-group">
                     <input type="text" class="form-control" id="city_search" name="city_search" placeholder="검색">
