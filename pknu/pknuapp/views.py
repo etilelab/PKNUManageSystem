@@ -267,14 +267,17 @@ def buy(request):
 def myinfo(request):
     user_id = request.session.get('user')
     if user_id:
-        employee_id = Member.objects.get(email=user_id).employee_id
 
-        sql ="select a.order_id, a.status, a.order_date, c.product_name, b.quantity, b.unit_price from orders a , order_items b, products c where a.employee_order=" + str(employee_id) + " and a.salesman_id=" + str(employee_id) + " and a.order_id = b.order_id and c.product_id = b.product_id"
+        employee_id = Member.objects.get(email=user_id).employee_id
+        employee = Employees.objects.get(employee_id=employee_id)
+
+        sql ="select a.order_id, a.status, a.order_date, c.product_name, b.quantity, b.unit_price from orders a , order_items b, products c where a.employee_order=" + str(employee_id) + " and a.salesman_id=" + str(employee_id) + " and a.order_id = b.order_id and c.product_id = b.product_id order by order_id desc limit 5"
         with connections["default"].cursor() as cursor:
             cursor.execute(sql)
             orders = cursor.fetchall()
 
-        res_data = {"orders": orders, 'user_id': user_id}
+        res_data = {"orders": orders, 'user_id': user_id,'employee':employee}
+
         return render(request, 'myinfo.html', res_data)
     return redirect('login')
 

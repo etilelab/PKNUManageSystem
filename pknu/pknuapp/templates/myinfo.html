@@ -8,9 +8,12 @@
         <div class="col-12">
             <h3 class="mb-3">부경재고관리시스템에 오신것을 환영합니다. {{user_id}} 님</h3>
           <ul>
-              <li>나의 이메일 : </li>
-              <li>나의 직책 : </li>
-                <li>나의 현금 보유량 : </li>
+              <li>나의 등록 이름 : {{ employee.first_name }} {{ employee.last_name }} </li>
+              <li>나의 직원 이메일 : {{ employee.email }}</li>
+              <li>입사일 : {{ employee.hire_date }} </li>
+              <li>나의 직책 : {{ employee.job_title }} </li>
+
+                <li>나의 현금 보유량 :{{ employee.credit_limit }}  </li>
               </ul>
         </div>
         <div class="col-12">
