@@ -17,14 +17,144 @@ from django.views.decorators.http import require_POST
 
 # Create your views here.
 
-
 def index(request):
     # 로그인 여부 확인
     user_id = request.session.get('user')
     if user_id:
-        res_data = {'user_id': user_id}
+        board = Board.objects.filter().order_by('-write_id').values()
+        pagenator = Paginator(board, 10)
+        p = int(request.GET.get('p', 1))
+        boards = pagenator.get_page(p)
+        res_data = {'user_id': user_id, 'manager_id':1,'boards':boards}
+
         return render(request, 'index.html', res_data)
 
+    return redirect('login')
+
+
+def detail_customerorders(request):
+    user_id = request.session.get('user')
+    if user_id:
+        customer_id = request.GET.get('customer_id', None)
+        customer_name = Customers.objects.get(customer_id=customer_id).name
+
+
+        sql = "select *from (select name, customers.customer_id, status, order_id, salesman_id, order_date from customers INNER JOIN orders ON customers.customer_id = orders.customer_id) a INNER JOIN (select product_name, order_id from order_items INNER JOIN products ON products.product_id = order_items.product_id) b ON a.order_id = b.order_id where a.customer_id = " + str(customer_id)
+        with connections["default"].cursor() as cursor:
+            cursor.execute(sql)
+            cus_order_detail = cursor.fetchall()
+
+
+        res_data = {'cus_order_detail':cus_order_detail,'customer_name':customer_name, 'user_id':user_id}
+        return render(request, 'detail_customerorders.html', res_data )
+
+
+def detail_customeritemcounts(request):
+    user_id = request.session.get('user')
+    if user_id:
+        customer_id = request.GET.get('customer_id', None)
+        customer_name = Customers.objects.get(customer_id=customer_id).name
+        sql = "select customer_id, name, product_name, count(*) as counts from ((select name, customers.customer_id, status, order_id, salesman_id, order_date from customers INNER JOIN orders ON customers.customer_id = orders.customer_id) a INNER JOIN (select product_name, order_id from order_items INNER JOIN products ON products.product_id = order_items.product_id) b ON a.order_id = b.order_id) where customer_id=" + str(
+            customer_id) + " group by product_name order by count(product_name) desc"
+
+
+
+        with connections["default"].cursor() as cursor:
+            cursor.execute(sql)
+            cus_item_counts = cursor.fetchall()
+
+        res_data = {'cus_item_counts': cus_item_counts,'customer_name':customer_name,'user_id':user_id}
+        return render(request, 'detail_customeritemcounts.html', res_data)
+
+def show_customers(request):
+    user_id = request.session.get('user')
+    if user_id:
+        if request.method == 'GET':
+            customers_data = Customers.objects.filter().values()
+            e_pagenator = Paginator(customers_data, 10)
+            ep = int(request.GET.get('ep', 1))
+            customers = e_pagenator.get_page(ep)
+
+            city_customers_data = Customers.objects.filter().values()
+            c_pagenator = Paginator(customers_data, 10)
+            cp = int(request.GET.get('cp', 1))
+            city_customers = c_pagenator.get_page(cp)
+
+            res_data = {
+                'customers': customers,
+                'customers_data': customers_data,
+                'city_customers': city_customers,
+                'city_customers_data': city_customers_data
+            }
+
+            return render(request, 'show_customers.html', res_data)
+
+        elif request.method == 'POST':
+            search = request.POST.get("search", "")
+            city_search = request.POST.get("city_search", "")
+
+            if search != "":
+                customers_data = Customers.objects.filter(Q(name=search)).values()
+            else:
+                customers_data = Customers.objects.filter().values()
+
+            if city_search != "":
+                city_customers_data = Customers.objects.filter(Q(city=city_search)).values()
+            else:
+                city_customers_data = Customers.objects.filter().values()
+
+            with connections["default"].cursor() as cursor:
+                cursor.execute(
+                    "select *from ("
+                    "select name, status, order_id, salesman_id,"
+                    "order_date from customers INNER JOIN orders ON customers.customer_id = orders.customer_id WHERE customers.customer_id = 1) a INNER JOIN"
+                    " (select product_name, order_id from order_items INNER JOIN "
+                    "products ON products.product_id = order_items.product_id) b ON a.order_id = b.order_id")
+                row = cursor.fetchall()
+
+
+            e_pagenator = Paginator(customers_data, 10)
+            ep = int(request.GET.get('ep', 1))
+            customers = e_pagenator.get_page(ep)
+
+            c_pagenator = Paginator(city_customers_data, 10)
+            cp = int(request.GET.get('cp', 1))
+            city_customers = c_pagenator.get_page(cp)
+
+            res_data = {
+                'customers':customers,
+                'city_customers': city_customers,
+                'customers_data':customers_data,
+                'city_customers_data':city_customers_data,
+                'search':search,
+                'city_search':city_search,
+                'user_id':user_id
+            }
+
+            return render(request, 'show_customers.html', res_data)
+
+def write(request):
+    # 로그인 여부 확인
+    user_id = request.session.get('user')
+    if user_id:
+        employee_id = Member.objects.get(email=user_id).employee_id
+        if request.method == 'GET':
+            res_data = {'user_id': user_id}
+            return render(request, 'write.html', res_data)
+        elif request.method == 'POST':
+            title = request.POST.get('title', "")
+            content = request.POST.get('content', "")
+            notice = request.POST.get('notice',"")
+
+            if title != "" and content != "" and (notice == "0" or notice == "1"):
+                write_id = Board.objects.filter().order_by('-write_id').values()[0]['write_id']
+                sql = "insert into board values(" + str(int(write_id)+1) + ",'"+ title + "','"+ content + "'," + str(employee_id) + ",'" + str(datetime.datetime.now()) + "'," + str(notice) + ")"
+                with connections["default"].cursor() as cursor:
+                    cursor.execute(sql)
+            else:
+                redirect('write')
+
+        return redirect('/')
     return redirect('login')
 
 
@@ -253,7 +383,17 @@ def register(request):
 
 
 def board(request):
-    pass
+    user_id = request.session.get('user')
+    if user_id:
+        write_id = request.GET.get('write_id', None)
+        boards = Board.objects.get(Q(write_id=write_id))
+        res_data = {
+            'user_id': user_id,
+            'board':boards
+        }
+        return render(request, 'board.html', res_data)
+    else:
+        return redirect('login')
 
 @require_POST
 def like(request):

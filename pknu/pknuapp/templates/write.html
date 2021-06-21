@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="py-5" style="" xmlns="http://www.w3.org/1999/html">
+    <div class="container">
+    <div class="row">
+
+        <div class="col-12">
+            <h5>부경재고관리시스템 게시글 작성</h5>
+            <form action="{% url 'write' %}" method="POST">
+                {% csrf_token %}
+             <input name="title" id="title" type="text" class="form-control" placeholder="제목을 입력해주세요">
+                <input style="margin-top: 10px" name="notice" id="notice" type="number" class="form-control" placeholder="공지사항 여부 (0, 1)">
+            <textarea style="height:500px; margin-top: 10px; margin-bottom: 10px" type="text" name="content" id="content" class="form-control" placeholder="내용을 입력해주세요" /></textarea>
+
+            <button type="submit" class="btn btn-primary">게시글작성</button>
+            </form>
+        </div>
+
+      </div>
+    </div>
+</div>
+
+{% endblock content %}

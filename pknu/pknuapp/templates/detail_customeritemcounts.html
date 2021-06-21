@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="py-5" style="">
+    <div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3">{{ customer_name }} 고객 구입 내역</h3>
+            <div class="table-responsive table-hover">
+                <table class="table">
+                  <thead>
+                    <tr>
+                        <th>고객 ID</th>
+                        <th>고객 이름</th>
+                        <th>제품 이름</th>
+                        <th>주문 횟수</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {% for cus_item_count in cus_item_counts %}
+                    <tr>
+                        <td>{{ cus_item_count.0 }}</td>
+                        <td>{{ cus_item_count.1 }}</td>
+                        <td>{{ cus_item_count.2 }}</td>
+                        <td>{{ cus_item_count.3 }}</td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                </table>
+                {% if cus_item_counts|length == 0 %}
+                <h4>고객이 구입한 내역이 없습니다.</h4>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock content %}
