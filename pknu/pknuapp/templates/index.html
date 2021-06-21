@@ -19,6 +19,7 @@
             <table class="table">
               <thead>
                 <tr>
+                    <th>공지여부</th>
                     <th>글번호</th>
                     <th>제목</th>
                     <th>작성일</th>
@@ -27,6 +28,13 @@
               <tbody>
               {% for board in boards %}
                 <tr>
+                    <td>
+                        {% if board.notice == 1 %}
+                        <strong><label style="color: red">공지</label></strong>
+                        {% else %}
+                        <strong><label>기타</label></strong>
+                        {% endif %}
+                    </td>
                     <td>{{ board.write_id }}</td>
                     <td><a href="board?write_id={{ board.write_id }}">{{ board.title }} </a></td>
                     <td>{{ board.write_date }}</td>

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="py-5" style="" xmlns="http://www.w3.org/1999/html">
+    <div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3>부경재고관리시스템 통계</h3>
+        </div>
+
+        <div class="col-12">
+            <h5>지역별 고객수 </h5>
+            <canvas id="myChart"></canvas>
+        </div>
+
+
+        <div class="col-12">
+            <h5>주문 상황</h5>
+            <canvas id="myChart2"></canvas>
+        </div>
+
+
+      </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+
+var location_customer_data = JSON.parse("{{ location_customer_data|escapejs }}");
+var location_customer_label = JSON.parse("{{ location_customer_label|escapejs }}");
+
+var chart = new Chart(ctx, {
+    type : 'bar',
+    data: { labels: location_customer_label,
+        datasets: [
+            {
+                label: '지역별 고객수',
+                backgroundColor: 'rgb(71, 71, 255)',
+                borderColor: 'rgb(71, 71, 255)', data: location_customer_data
+            }
+            ]
+    },
+});
+</script>
+
+<script>
+var ctx = document.getElementById('myChart2').getContext('2d');
+
+var status_data = JSON.parse("{{ status_data|escapejs }}");
+var status_label = JSON.parse("{{ status_label|escapejs }}");
+
+var chart = new Chart(ctx, {
+    type : 'doughnut',
+    data: { labels: status_label,
+        datasets: [
+            {
+                label: '주문현황',
+                backgroundColor: ['rgb(71, 71, 255)','rgb(255, 71, 71)','rgb(51, 136, 33)'],
+               data: status_data
+            }
+            ]
+    },
+});
+</script>
+
+{% endblock content %}

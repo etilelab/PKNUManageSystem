@@ -6,7 +6,11 @@
     <div class="container">
     <div class="row">
         <div class="mx-auto col-md-8">
-            <h3 class="mb-3">{{ board.title }} <small>(작성일 : {{ board.write_date}})</small></h3>
+            <h3 class="mb-3">
+                {% if board.notice != 0%}
+                <label style="color: red">[공지]</label>
+                {% endif %}
+                {{ board.title }} <small>(작성일 : {{ board.write_date}})</small></h3>
             <p>{{ board.content }}</p>
         </div>
       </div>

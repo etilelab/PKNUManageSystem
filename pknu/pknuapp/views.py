@@ -21,11 +21,16 @@ def index(request):
     # 로그인 여부 확인
     user_id = request.session.get('user')
     if user_id:
+        employee_id = Member.objects.get(email=user_id).employee_id
+        manager_id = Employees.objects.get(employee_id=employee_id).manager_id
+
+        print(manager_id)
+
         board = Board.objects.filter().order_by('-write_id').values()
         pagenator = Paginator(board, 10)
         p = int(request.GET.get('p', 1))
         boards = pagenator.get_page(p)
-        res_data = {'user_id': user_id, 'manager_id':1,'boards':boards}
+        res_data = {'user_id': user_id, 'manager_id':manager_id,'boards':boards}
 
         return render(request, 'index.html', res_data)
 
@@ -44,7 +49,6 @@ def detail_customerorders(request):
             cursor.execute(sql)
             cus_order_detail = cursor.fetchall()
 
-
         res_data = {'cus_order_detail':cus_order_detail,'customer_name':customer_name, 'user_id':user_id}
         return render(request, 'detail_customerorders.html', res_data )
 
@@ -56,8 +60,6 @@ def detail_customeritemcounts(request):
         customer_name = Customers.objects.get(customer_id=customer_id).name
         sql = "select customer_id, name, product_name, count(*) as counts from ((select name, customers.customer_id, status, order_id, salesman_id, order_date from customers INNER JOIN orders ON customers.customer_id = orders.customer_id) a INNER JOIN (select product_name, order_id from order_items INNER JOIN products ON products.product_id = order_items.product_id) b ON a.order_id = b.order_id) where customer_id=" + str(
             customer_id) + " group by product_name order by count(product_name) desc"
-
-
 
         with connections["default"].cursor() as cursor:
             cursor.execute(sql)
@@ -82,6 +84,7 @@ def show_customers(request):
 
             res_data = {
                 'customers': customers,
+                'user_id':user_id,
                 'customers_data': customers_data,
                 'city_customers': city_customers,
                 'city_customers_data': city_customers_data
@@ -132,6 +135,7 @@ def show_customers(request):
             }
 
             return render(request, 'show_customers.html', res_data)
+    return redirect('login')
 
 def write(request):
     # 로그인 여부 확인
@@ -409,46 +413,49 @@ def like(request):
 def buy(request):
     user_id = request.session.get('user')
     if user_id:
-        employee_id = Member.objects.get(email=user_id).employee_id
+        try:
+            employee_id = Member.objects.get(email=user_id).employee_id
 
-        product_id = request.POST.get('productid', "")
-        warehouse_name = request.POST.get('warehouse_name', "")
-        product_price = request.POST.get('product_price', "")
-        quantity = request.POST.get('quantity', "")
+            product_id = request.POST.get('productid', "")
+            warehouse_name = request.POST.get('warehouse_name', "")
+            product_price = request.POST.get('product_price', "")
+            quantity = request.POST.get('quantity', "")
 
-        if product_id != "" and warehouse_name != "" and product_price != "" and quantity != "":
-            quantity = float(quantity)
-            product_price = float(product_price)
+            if product_id != "" and warehouse_name != "" and product_price != "" and quantity != "":
+                quantity = float(quantity)
+                product_price = float(product_price)
 
-            warehouse_id = Warehouses.objects.get(warehouse_name=warehouse_name).warehouse_id
-            credit_limit = Employees.objects.get(employee_id=employee_id).credit_limit
-            remain_quantity = float(Inventories.objects.get(Q(warehouse_id=warehouse_id) & Q(product_id=product_id)).quantity)
+                warehouse_id = Warehouses.objects.get(warehouse_name=warehouse_name).warehouse_id
+                credit_limit = Employees.objects.get(employee_id=employee_id).credit_limit
+                remain_quantity = float(Inventories.objects.get(Q(warehouse_id=warehouse_id) & Q(product_id=product_id)).quantity)
 
-            if quantity < remain_quantity and quantity*product_price < credit_limit:
-                buy_time = datetime.datetime.now()
-                new_order_id = Orders.objects.all().order_by('-order_id')[0].order_id + 1
+                if quantity < remain_quantity and quantity*product_price < credit_limit:
+                    buy_time = datetime.datetime.now()
+                    new_order_id = Orders.objects.all().order_by('-order_id')[0].order_id + 1
 
-                Orders.objects.create(salesman_id =employee_id, status="Pending", employee_order=1, order_date=buy_time, order_id=new_order_id)
-                OrderItems.objects.create(item_id =1, order_id=new_order_id, product_id=product_id, quantity=quantity, unit_price=product_price)
+                    Orders.objects.create(salesman_id =employee_id, status="Pending", employee_order=1, order_date=buy_time, order_id=new_order_id)
+                    OrderItems.objects.create(item_id =1, order_id=new_order_id, product_id=product_id, quantity=quantity, unit_price=product_price)
 
-                sql = "update inventories set quantity=" + str(remain_quantity-quantity) + " where warehouse_id=" + str(warehouse_id) + " and product_id=" + str(product_id) + ""
-                with connections["default"].cursor() as cursor:
-                    cursor.execute(sql)
-                sql = "update employees set credit_limit=" + str(credit_limit - product_price) + " where employee_id=" + str(employee_id)
-                with connections["default"].cursor() as cursor:
-                    cursor.execute(sql)
+                    sql = "update inventories set quantity=" + str(remain_quantity-quantity) + " where warehouse_id=" + str(warehouse_id) + " and product_id=" + str(product_id) + ""
+                    with connections["default"].cursor() as cursor:
+                        cursor.execute(sql)
+                    sql = "update employees set credit_limit=" + str(credit_limit - product_price) + " where employee_id=" + str(employee_id)
+                    with connections["default"].cursor() as cursor:
+                        cursor.execute(sql)
 
-                message = "성공적으로 주문을 진행하였습니다. 구매완료! 남은 현금은 " + str(credit_limit) + "$ 입니다. 내 정보보기에서 구매내역을 확인하세요"
-            elif quantity > remain_quantity:
-                message = "재고가 부족합니다."
-            elif quantity*product_price > credit_limit:
-                message = "현금이 부족합니다. 현금을 추가로 결제해주세요. 현재 가지고있는 현금은 " + str(credit_limit) + "$ 입니다."
+                    message = "성공적으로 주문을 진행하였습니다. 구매완료! 남은 현금은 " + str(credit_limit) + "$ 입니다. 내 정보보기에서 구매내역을 확인하세요"
+                elif quantity > remain_quantity:
+                    message = "재고가 부족합니다."
+                elif quantity*product_price > credit_limit:
+                    message = "현금이 부족합니다. 현금을 추가로 결제해주세요. 현재 가지고있는 현금은 " + str(credit_limit) + "$ 입니다."
+                else:
+                    message = "주문에 실패하였습니다"
+
+                res_data = {"message":message,'user_id':user_id}
             else:
-                message = "주문에 실패하였습니다"
-
-            res_data = {"message":message,'user_id':user_id}
-        else:
-            res_data = {"message":"에러 발생", 'user_id':user_id}
+                res_data = {"message":"에러 발생", 'user_id':user_id}
+        except:
+            res_data={'message':'에러 발생, 값을 제대로 입력하였는지 확인해주세요.'}
         return render(request, 'buy.html', res_data)
     else:
         return redirect('login')
@@ -466,7 +473,8 @@ def myinfo(request):
                 cursor.execute(sql)
 
         employee = Employees.objects.get(employee_id=employee_id)
-        sql ="select a.order_id, a.status, a.order_date, c.product_name, b.quantity, b.unit_price from orders a , order_items b, products c where a.employee_order=" + str(employee_id) + " and a.salesman_id=" + str(employee_id) + " and a.order_id = b.order_id and c.product_id = b.product_id order by order_id desc limit 5"
+        sql ="select a.order_id, a.status, a.order_date, c.product_name, b.quantity, b.unit_price from orders a , order_items b, products c where a.employee_order=1 and  + a.salesman_id=" + str(employee_id) + " and a.order_id = b.order_id and c.product_id = b.product_id order by order_id desc limit 5"
+        print(sql)
         with connections["default"].cursor() as cursor:
             cursor.execute(sql)
             orders = cursor.fetchall()
@@ -487,8 +495,9 @@ def customers(request):
             customers = e_pagenator.get_page(ep)
 
             res_data = {
+                'user_id': user_id,
                 'customers': customers,
-                'customers_data': customers_data
+                'customers_data': customers_data,
             }
 
             return render(request, 'customers.html', res_data)
@@ -502,41 +511,46 @@ def customers(request):
             customers = e_pagenator.get_page(ep)
             res_data = {
                 'customers':customers,
-                'customers_data':customers_data
+                'customers_data':customers_data,
+                'user_id':user_id,
             }
 
             return render(request, 'customers.html', res_data)
 
 
 
-
-    #elif request.method == 'POST':
-
-        # customers_data = Customers.objects.filter().values()
-        #
-        # e_pagenator = Paginator(customers_data, 10)
-        # ep = int(request.GET.get('ep', 1))
-        # customers = e_pagenator.get_page(ep)
-
-
-    # try:
-    #     #fcuser = Member.objects.get(email=email)
-    #
-    #     if search_target == customers_data.name:
-    #         #request.session['user'] = fcuser.email
-    #         return redirect('/')
-    #     else:
-    #         #res_data['error'] = 'Login failed'
-    # except Member.DoesNotExist:
-    #     #res_data['error'] = 'Login failed'
-
-        # res_data = {
-        #     'customers' : customers,
-        #     'customers_data' : customers_data
-        # }
-
-
-
-
 def statistics(request):
-    pass
+    user_id = request.session.get('user')
+    if user_id:
+
+        sql = "select count(*), a.city from locations a , customers b where a.city = b.city group by a.city"
+        with connections["default"].cursor() as cursor:
+            cursor.execute(sql)
+            customer_data = cursor.fetchall()
+
+        location_customer_data = []
+        location_customer_label = []
+        for i in customer_data:
+            location_customer_data.append(i[0])
+            location_customer_label.append(i[1])
+
+        sql = "select count(*), status from orders group by status"
+        with connections["default"].cursor() as cursor:
+            cursor.execute(sql)
+            status_datas = cursor.fetchall()
+
+        status_data = []
+        status_label = []
+        for i in status_datas:
+            status_data.append(i[0])
+            status_label.append(i[1])
+
+        res_data = {
+            'location_customer_data': json.dumps(location_customer_data),
+            'location_customer_label': json.dumps(location_customer_label),
+            'status_data': json.dumps(status_data),
+            'status_label': json.dumps(status_label),
+            'user_id':user_id
+        }
+
+        return render(request, 'statistics.html', res_data)

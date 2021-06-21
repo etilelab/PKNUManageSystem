@@ -19,5 +19,5 @@ urlpatterns = [
 path('showcustomers',views.show_customers, name='showcustomers'),
     path('detail_customerorders',views.detail_customerorders, name='detail_customerorders'),
     path('detail_customeritemcounts',views.detail_customeritemcounts, name='detail_customeritemcounts'),
-
+    path('statistics',views.statistics, name='statistics')
 ]
