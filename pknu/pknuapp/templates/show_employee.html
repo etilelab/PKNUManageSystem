@@ -20,21 +20,19 @@
             <table class="table">
               <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Hire Date</th>
-                    <th>Job Title</th>
+                    <th>ID</th>
+                    <th>직원명</th>
+                    <th>이메일</th>
+                    <th>연락처</th>
+                    <th>입사일</th>
+                    <th>직책명</th>
                 </tr>
               </thead>
               <tbody>
               {% for employee in employees %}
                 <tr>
                     <td>{{ employee.employee_id }}</td>
-                    <td>{{ employee.first_name }}</td>
-                    <td>{{ employee.last_name }}</td>
+                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
                     <td>{{ employee.email }}</td>
                     <td>{{ employee.phone }}</td>
                     <td>{{ employee.hire_date }}</td>

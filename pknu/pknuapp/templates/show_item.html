@@ -15,39 +15,25 @@
         <div class="col-md-12">
           <ul class="nav nav-tabs" style="">
             <li class="nav-item"> <a href="" class="active nav-link" data-toggle="tab" data-target="#tabone">기본보기</a> </li>
+              <li class="nav-item"> <a href="" class="nav-link" data-toggle="tab" data-target="#tabthree">품목별보기</a> </li>
             <li class="nav-item"> <a class="nav-link" href="" data-toggle="tab" data-target="#tabtwo">순위순</a> </li>
           </ul>
           <div class="tab-content mt-2">
-            <div class="tab-pane fade show active" id="tabone" role="tabpanel">
-      <div class="row" style="margin-bottom: 10px">
-        <div class="col-12">
-          <div class="btn-group">
-            <button class="btn btn-primary dropdown-toggle" id="category_id" data-toggle="dropdown">제품 카테고리</button>
-            <div class="dropdown-menu" id="category">
-                <a class="dropdown-item" href="#">전체 카테고리</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">카테고리 1</a>
-                <a class="dropdown-item" href="#">카테고리 2</a>
-                <a class="dropdown-item" href="#">카테고리 3</a>
-                <a class="dropdown-item" href="#">카테고리 4</a>
-                <a class="dropdown-item" href="#">카테고리 5</a>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="row" style="margin-bottom: 10px">
-         <div class="col-12">
-          <!--<form class="form-inline" method="POST" action="{% url 'showitem' %}">-->
-             <form class="form-inline" method="POST" action="{% url 'showitem' %}">
-              {% csrf_token %}
-              <input type="hidden" id="hidden_category_id" class="hidden_category_id" name="hidden_category_id"/>
-              <input type="text" style="margin-right: 5px" class="form-control" id="product_name" name="product_name" placeholder="제품명">
-              <input type="number" style="margin-right: 5px" class="form-control" id="product_min" name="product_min" placeholder="1000"> ~<input name="product_max" type="number" class="form-control" id="product_max" placeholder="10000">
-            <button type="submit" style="margin-right: 5px" class="btn btn-primary ">검색</button>
-          </form>
-        </div>
-      </div>
+              <div class="tab-pane fade show active" id="tabone" role="tabpanel">
+
+                  <div class="row" style="margin-bottom: 10px">
+                     <div class="col-12">
+                      <!--<form class="form-inline" method="POST" action="{% url 'showitem' %}">-->
+                         <form class="form-inline" method="POST" action="{% url 'showitem' %}">
+                          {% csrf_token %}
+                          <input type="hidden" id="hidden_category_id" class="hidden_category_id" name="hidden_category_id"/>
+                          <input type="text" style="margin-right: 5px" class="form-control" id="product_name" name="product_name" placeholder="제품명">
+                          <input type="number" style="margin-right: 5px" class="form-control" id="product_min" name="product_min" placeholder="1000"> ~<input name="product_max" type="number" class="form-control" id="product_max" placeholder="10000">
+                        <button type="submit" style="margin-right: 5px" class="btn btn-primary ">검색</button>
+                      </form>
+                    </div>
+                  </div>
 
         <div class="row">
             <div class="col-12">
@@ -73,8 +59,8 @@
                     <td>{{ product.description }}</td>
                     <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
                     <td>{{ product.category_id }}</td>
-                    <td>{{ product.likes }} (좋아요)</td>
-                    <td>상세보기</td>
+                    <td><label id="count-{{ product.product_id }}">{{ product.likes }}</label> <button name="{{ product.product_id }}" class="btn btn-primary like">좋아요</button></td>
+                    <td><button onclick="location.href='detail?product_id={{ product.product_id }}'" class="btn btn-primary">상세보기</button></td>
                 </tr>
               {% endfor %}
               </tbody>
@@ -119,12 +105,174 @@
         </div>
 
             </div>
+
+           <div class="tab-pane fade" id="tabthree" role="tabpanel">
+              <div class="row" style="margin-bottom: 10px">
+                <div class="col-12" style="margin-bottom: 10px">
+                  <div class="btn-group">
+                    <button class="btn btn-primary dropdown-toggle" id="category_id" data-toggle="dropdown">제품 카테고리</button>
+                    <div class="dropdown-menu" id="category">
+                        <a class="dropdown-item" href="#">전체 카테고리</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">1 (CPU)</a>
+                        <a class="dropdown-item" href="#">2 (Video Card)</a>
+                        <a class="dropdown-item" href="#">3 (Ram)</a>
+                        <a class="dropdown-item" href="#">4 (Mother Board)</a>
+                        <a class="dropdown-item" href="#">5 (Storage)</a>
+                    </div>
+                  </div>
+                </div>
+                  <div class="col-12">
+                      <div class="table-responsive table-hover">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>제품명</th>
+                                <th>제품설명</th>
+                                <th>가격<small>(직원할인가)</small></th>
+                                <th>카테고리</th>
+                                <th>좋아요</th>
+                                <th>조회수</th>
+                                <th>고객구매수</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          {% for product in customer_products %}
+                            <tr>
+                                <td>{{ product.0 }}</td>
+                                <td>{{ product.3 }}</td>
+                                <td>{{ product.4 }}</td>
+                                <td>{{ product.6 }}$ <small>{{ product.10 }}</small></td>
+                                <td>{{ product.7 }}</td>
+                                <td>{{ product.8 }}</td>
+                                <td>{{ product.9 }}</td>
+                                <td>{{ product.1 }}</td>
+                            </tr>
+                          {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+              </div>
+           </div>
+
+
             <div class="tab-pane fade" id="tabtwo" role="tabpanel">
-              <p class="">Who formed us in his own image, and the breath of that universal love which bears and sustains us. And then, my friend.</p>
+                <div class="row">
+                <div class="col-12">
+                    <h5>고객구매순 TOP 10</h5>
+                  <div class="table-responsive table-hover">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>제품명</th>
+                            <th>제품설명</th>
+                            <th>가격<small>(직원할인가)</small></th>
+                            <th>카테고리</th>
+                            <th>좋아요</th>
+                            <th>조회수</th>
+                            <th>고객구매수</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for product in customer_products %}
+                        <tr>
+                            <td>{{ product.0 }}</td>
+                            <td>{{ product.3 }}</td>
+                            <td>{{ product.4 }}</td>
+                            <td>{{ product.6 }}$ <small>{{ product.10 }}</small></td>
+                            <td>{{ product.7 }}</td>
+                            <td>{{ product.8 }}</td>
+                            <td>{{ product.9 }}</td>
+                            <td>{{ product.1 }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <h5>좋아요 TOP 10</h5>
+                  <div class="table-responsive table-hover">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>제품명</th>
+                            <th>제품설명</th>
+                            <th>가격<small>(직원할인가)</small></th>
+                            <th>카테고리</th>
+                            <th>좋아요</th>
+                            <th>조회수</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for product in likes_products %}
+                        <tr>
+                            <td>{{ product.product_id }}</td>
+                            <td>{{ product.product_name }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
+                            <td>{{ product.category_id }}</td>
+                                {% if product.likes > 5 %}
+                                <td style="background-color: coral">
+                            <label style="color: whitesmoke"><strong>{{ product.likes }}</strong></label></td>
+                                {% else %}
+                            <td>
+                                <label>{{ product.likes }}</label></td>
+                                {% endif %}
+                            </td>
+                            <td>{{ product.views }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <h5>조회순 TOP 10</h5>
+                  <div class="table-responsive table-hover">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>제품명</th>
+                            <th>제품설명</th>
+                            <th>가격<small>(직원할인가)</small></th>
+                            <th>카테고리</th>
+                            <th>좋아요</th>
+                            <th>조회수</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for product in views_products %}
+                        <tr>
+                            <td>{{ product.product_id }}</td>
+                            <td>{{ product.product_name }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>{{ product.list_price }}$ <small>{{ product.discount_price }}</small></td>
+                            <td>{{ product.category_id }}</td>
+                            <td>{{ product.likes }}</td>
+                            <td>{{ product.views }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                </div>
+
+
             </div>
-            <div class="tab-pane fade" id="tabthree" role="tabpanel">
-              <p class="">In my soul and absorb its power, like the form of a beloved mistress, then I often think with longing.</p>
-            </div>
+
           </div>
         </div>
     </div>
@@ -132,15 +280,32 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-
+<!--<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
 <script>
     $('#category > a').on('click', function() {
     $('#category_id').text($(this).text());
-    $('#hidden_category_id').text($(this).text());
-
+     $("input[name=hidden_category_id]").val($(this).text());
     // alert($(this).attr('value'));
 });
+</script>
+
+<script type="text/javascript">
+    $(".like").click(function () { // .like 버튼을 클릭 감지
+        var product_id = $(this).attr('name');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'like' %}",
+            data: { 'productid': product_id, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+            dataType: "json",
+            success: function (response) {
+                $("#count-" + product_id).html(response.likes_count);
+            },
+            error: function (request, status, error) {
+                alert(error);
+            },
+        });
+    })
 </script>
 
 {% endblock content %}

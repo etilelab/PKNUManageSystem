@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="py-5" style="">
+    <div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3">제품 상세보기</h3>
+            <div class="table-responsive table-hover">
+                <table class="table">
+                  <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>카테고리명</th>
+                        <th>제품명</th>
+                        <th>제품설명</th>
+                        <th>가격<small>(직원할인가)</small></th>
+                        <th>카테고리</th>
+                        <th>좋아요</th>
+                        <th>조회수</th>
+                        <th>고객구매횟수</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <td>{{ product_detail.2 }}</td>
+                        <td>{{ product_detail.12 }}</td>
+                        <td>{{ product_detail.3 }}</td>
+                        <td>{{ product_detail.4 }}</td>
+                        <td>{{ product_detail.6 }}$ <small>{{ product.10 }}</small></td>
+                        <td>{{ product_detail.7 }}</td>
+                            {% if product_detail.8 > 5 %}
+                            <td style="background-color: coral">
+                        <label style="color: whitesmoke"><strong>{{ product_detail.8 }}</strong></label></td>
+                            {% else %}
+                        <td>
+                            <label>{{ product_detail.8 }}</label></td>
+                            {% endif %}
+                        </td>
+                        <td>{{ product_detail.9 }}</td>
+                        <td>{% if product_detail.1 == None %}
+                            0
+                            {% else %}
+                            {{ product_detail.1 }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+            <h3 class="mb-3">제품 재고현황</h3>
+            <div class="table-responsive table-hover">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                            <th>재고창고명</th>
+                            <th>수량</th>
+                            <th>재고창고 도시(City)</th>
+                            <th>재고창고 주(State)</th>
+                            <th>재고창고 나라(State)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for product in products %}
+                        <tr>
+                            <td>{{ product.4 }}</td>
+                            <td>{{ product.2 }}</td>
+                            <td>{{ product.9 }}</td>
+                            <td>{{ product.10 }}</td>
+                            <td>{{ product.11 }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+
+                  </div>
+                {% if products|length <= 0 %}
+            <center><h5 style="color: red"><b>재고가 없습니다</b></h5></center>
+                {% endif %}
+
+             <h3 class="mb-3">제품 구매하기</h3>
+            <div class="col-12">
+            {% if products|length <= 0 %}
+            <center><h5 style="color: red"><b>재고가 없어 구매가 불가능합니다</b></h5></center>
+
+                {% else %}
+
+                 <form class="form-inline" method="POST" action="{% url 'buy' %}">
+                  {% csrf_token %}
+                  <input type="hidden" id="productid" class="productid" name="productid" value="{{ product_detail.2 }}"/>
+                     <input type="hidden" id="product_price" class="product_price" name="product_price" value="{{ product_detail.6 }}"/>
+                  <input type="text" style="margin-right: 5px" class="form-control" id="warehouse_name" name="warehouse_name" placeholder="재고창고명">
+                  <input type="number" style="margin-right: 5px" class="form-control" id="quantity" name="quantity" placeholder="수량">
+                <button type="submit" style="margin-right: 5px" class="btn btn-primary ">구매</button>
+              </form>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock content %}
