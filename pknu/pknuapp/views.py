@@ -117,9 +117,6 @@ def detail(request):
         with connections["default"].cursor() as cursor:
             cursor.execute(sql)
             products = cursor.fetchall()
-
-        print(sql)
-
         res_data = {'product_detail':product_detail,'products':products}
         return render(request, 'detail.html', res_data)
 
@@ -179,7 +176,6 @@ def like(request):
     products_data = Products.objects.get(Q(product_id=product_id))
     products_data.likes = products_data.likes + 1
     products_data.save()
-
     likes = products_data.likes
     context = {'likes_count':likes}
     return HttpResponse(json.dumps(context), content_type="application/json")

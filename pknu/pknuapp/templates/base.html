@@ -24,7 +24,13 @@
           <li class="nav-item"> <a class="nav-link" href="{% url 'showitem' %}">제품정보보기</a> </li>
           <li class="nav-item"> <a class="nav-link" href="">고객정보보기</a> </li>
           <li class="nav-item"> <a class="nav-link" href="">내정보보기</a> </li>
-        </ul> <a class="btn navbar-btn ml-md-2 btn-light text-dark">로그아웃</a>
+        </ul>
+        {% if user_id %}
+        <a class="btn navbar-btn ml-md-2 btn-light text-dark" href="logout">로그아웃</a>
+        {% else %}
+        <a class="btn navbar-btn ml-md-2 btn-light text-dark" href="login">로그인</a>
+        {% endif %}
+
       </div>
     </div>
   </nav>
